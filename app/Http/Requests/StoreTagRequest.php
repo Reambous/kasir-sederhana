@@ -6,23 +6,25 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreTagRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return false;
+        return true; // Izinkan semua request untuk saat ini
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            //
+            'nama' => ['required', 'string', 'max:255', 'unique:tags,nama']
+            // unique memastikan tidak ada tag dengan nama ganda
+        ];
+    }
+
+    public function messages(): array
+    {
+        // Custom pesan error sesuai flowchart kamu
+        return [
+            'nama.required' => 'Nama wajib diisi',
+            'nama.unique' => 'Nama tag ini sudah digunakan',
         ];
     }
 }
