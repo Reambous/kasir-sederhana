@@ -65,4 +65,31 @@ class OrderController extends Controller
             return back()->with('error', $e->getMessage());
         }
     }
+    // Fungsi untuk Export / Cetak Invoice
+    public function export(Order $order)
+    {
+        // 1. Sistem get transaksi_item (Mengambil data relasi secara efisien menggunakan 'load')
+        // Ini menghindari query berulang-ulang ke database (N+1 problem)
+        $order->load('items');
+
+        // 2. Hitung total harga barang murni (sebelum potongan)
+        // Kita gunakan fungsi bawaan koleksi Laravel 'sum()' agar tidak perlu repot pakai foreach manual
+        $total_harga_barang = $order->items->sum(function ($item) {
+            return $item->harga_jual * $item->jumlah;
+        });
+
+        // 3. Hitung total dikurangi potongan
+        $total_bayar = $total_harga_barang - $order->potongan;
+
+        // 4. Hitung kembalian (uang diterima - total bayar)
+        $kembalian = $order->uang_diterima - $total_bayar;
+
+        // 5. Export ke tampilan (View) khusus untuk dicetak
+        return view('orders.invoice', [
+            'order'              => $order,
+            'total_harga_barang' => $total_harga_barang,
+            'total_bayar'        => $total_bayar,
+            'kembalian'          => $kembalian
+        ]);
+    }
 }
