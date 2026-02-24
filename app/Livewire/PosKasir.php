@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\Product;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Tag; // Tambahkan ini untuk memanggil Tag
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Exception;
@@ -13,16 +14,17 @@ use Exception;
 class PosKasir extends Component
 {
     public $search = '';
-    public $cart = []; // Menyimpan daftar belanja
+    public $selectedTags = []; // <-- Variabel penampung Tag yang dicentang
+    public $cart = [];
     public $uang_diterima = 0;
     public $potongan = 0;
     public $metode_pembayaran = 'cash';
     public $nama_buyer = '';
     public $lastOrderId = null;
 
-    // Fungsi untuk menambah barang ke keranjang
+    // --- FUNGSI KERANJANG SEBELUMNYA (TETAP SAMA) ---
     public function addToCart($productId)
-    {
+    { /* ... isi dari fungsi sebelumnya biarkan sama ... */
         $product = Product::find($productId);
 
         if (!$product || $product->jumlah <= 0) {
@@ -30,16 +32,13 @@ class PosKasir extends Component
             return;
         }
 
-        // Cek apakah barang sudah ada di keranjang
         if (array_key_exists($productId, $this->cart)) {
-            // Cek limit stok
             if ($this->cart[$productId]['jumlah'] >= $product->jumlah) {
                 session()->flash('error', 'Stok tidak mencukupi!');
                 return;
             }
             $this->cart[$productId]['jumlah']++;
         } else {
-            // Tambah barang baru ke keranjang
             $this->cart[$productId] = [
                 'id' => $product->id,
                 'nama' => $product->nama,
@@ -49,17 +48,48 @@ class PosKasir extends Component
         }
     }
 
-    // Fungsi mengurangi/menghapus dari keranjang
     public function decreaseQty($productId)
-    {
+    { /* ... isi fungsi sebelumnya ... */
         if ($this->cart[$productId]['jumlah'] > 1) {
             $this->cart[$productId]['jumlah']--;
         } else {
-            unset($this->cart[$productId]); // Hapus jika qty 0
+            unset($this->cart[$productId]);
         }
     }
 
-    // Menghitung total belanja secara real-time
+    // --- FUNGSI BARU UNTUK KETIK MANUAL & HAPUS BARANG ---
+
+    // Fungsi Hapus total dari keranjang
+    public function removeItem($productId)
+    {
+        if (isset($this->cart[$productId])) {
+            unset($this->cart[$productId]);
+        }
+    }
+
+    // Fungsi Update saat kasir mengetik angka
+    public function updateQty($productId, $qty)
+    {
+        $qty = (int) $qty; // Pastikan jadi angka
+
+        if ($qty <= 0) {
+            $this->removeItem($productId);
+            return;
+        }
+
+        $product = Product::find($productId);
+        if ($product) {
+            if ($qty > $product->jumlah) {
+                // Jika ketik melebihi stok, mentokkan ke maksimal stok
+                session()->flash('error', 'Stok ' . $product->nama . ' hanya tersisa ' . $product->jumlah . '!');
+                $this->cart[$productId]['jumlah'] = $product->jumlah;
+            } else {
+                $this->cart[$productId]['jumlah'] = $qty;
+            }
+        }
+    }
+
+    // --- FUNGSI TOTAL & CHECKOUT SEBELUMNYA (TETAP SAMA) ---
     public function getTotalProperty()
     {
         $total = 0;
@@ -69,9 +99,9 @@ class PosKasir extends Component
         return $total - (empty($this->potongan) ? 0 : $this->potongan);
     }
 
-    // Fungsi Checkout (Mengeksekusi DB Transaction yang sudah kita buat sebelumnya)
     public function checkout()
     {
+        // ... (Isi fungsi checkout persis seperti yang terakhir kita buat dengan $newOrderId) ...
         if (empty($this->cart)) {
             session()->flash('error', 'Keranjang kosong!');
             return;
@@ -83,9 +113,8 @@ class PosKasir extends Component
         }
 
         try {
-            $newOrderId = null; // 1. BUAT PENAMPUNG KOSONG
+            $newOrderId = null;
 
-            // 2. TAMBAHKAN 'use (&$newOrderId)' AGAR ID BISA DIKELUARKAN DARI DALAM TRANSACTION
             DB::transaction(function () use (&$newOrderId) {
                 $orderCode = 'INV-' . date('Ymd') . '-' . strtoupper(uniqid());
 
@@ -100,7 +129,7 @@ class PosKasir extends Component
                     'user_id'           => Auth::id(),
                 ]);
 
-                $newOrderId = $order->id; // 3. SIMPAN ID TRANSAKSI YANG BARU JADI KE PENAMPUNG
+                $newOrderId = $order->id;
 
                 foreach ($this->cart as $item) {
                     $product = Product::lockForUpdate()->find($item['id']);
@@ -117,13 +146,10 @@ class PosKasir extends Component
                 }
             });
 
-            // Kosongkan form setelah sukses
             $this->cart = [];
             $this->uang_diterima = 0;
             $this->potongan = 0;
             $this->nama_buyer = '';
-
-            // 4. MASUKKAN ID KE VARIABEL PUBLIK AGAR DIBACA OLEH HTML/BLADE
             $this->lastOrderId = $newOrderId;
 
             session()->flash('success', 'Transaksi Berhasil!');
@@ -134,13 +160,27 @@ class PosKasir extends Component
 
     public function render()
     {
-        // Fitur pencarian barang secara real-time
-        $products = Product::where('nama', 'like', '%' . $this->search . '%')
-            ->orWhere('barcode', 'like', '%' . $this->search . '%')
-            ->get();
+        // 1. Ambil semua Tag untuk ditampilkan di tombol filter
+        $allTags = Tag::all();
+
+        // 2. Query Pencarian Barang (Sekarang mendukung Filter Tag)
+        $query = Product::where(function ($q) {
+            $q->where('nama', 'like', '%' . $this->search . '%')
+                ->orWhere('barcode', 'like', '%' . $this->search . '%');
+        });
+
+        // Jika ada Tag yang dicentang, filter produk yang punya Tag tersebut
+        if (!empty($this->selectedTags)) {
+            $query->whereHas('tags', function ($q) {
+                $q->whereIn('tags.id', $this->selectedTags);
+            });
+        }
+
+        $products = $query->get();
 
         return view('livewire.pos-kasir', [
-            'products' => $products
+            'products' => $products,
+            'allTags' => $allTags
         ]);
     }
 }
