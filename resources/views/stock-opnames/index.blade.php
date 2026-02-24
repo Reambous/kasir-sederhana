@@ -46,14 +46,26 @@
                             <p class="text-sm text-gray-500">Dimulai pada: {{ $activeSO->tanggal_mulai }}</p>
                         </div>
 
-                        <form action="{{ route('stock-opnames.finish', $activeSO->id) }}" method="POST"
-                            onsubmit="return confirm('Selesaikan Stock Opname? Stok semua barang akan diperbarui secara permanen sesuai inputan Anda.');">
-                            @csrf
-                            <button type="submit"
-                                class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded shadow transition">
-                                Selesaikan & Update Stok
-                            </button>
-                        </form>
+                        <div class="flex space-x-3">
+                            <form action="{{ route('stock-opnames.cancel', $activeSO->id) }}" method="POST"
+                                onsubmit="return confirm('Yakin ingin membatalkan sesi ini? Semua data input akan hangus.');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                    class="bg-gray-100 border border-gray-300 hover:bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded shadow-sm transition">
+                                    Batalkan Sesi
+                                </button>
+                            </form>
+
+                            <form action="{{ route('stock-opnames.finish', $activeSO->id) }}" method="POST"
+                                onsubmit="return confirm('Selesaikan Stock Opname? Stok semua barang akan diperbarui secara permanen sesuai inputan Anda.');">
+                                @csrf
+                                <button type="submit"
+                                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded shadow transition">
+                                    Selesaikan & Update Stok
+                                </button>
+                            </form>
+                        </div>
                     </div>
 
                     @if ($soProducts->isEmpty())
@@ -69,49 +81,59 @@
                             </form>
                         </div>
                     @else
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr class="bg-gray-100 border-b border-gray-200">
-                                        <th class="py-3 px-4 font-semibold text-sm text-gray-600">Nama Barang</th>
-                                        <th class="py-3 px-4 font-semibold text-sm text-gray-600 text-center">Stok
-                                            Sistem</th>
-                                        <th class="py-3 px-4 font-semibold text-sm text-gray-600">Input Stok Fisik
-                                            Aktual</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($soProducts as $item)
-                                        <tr class="border-b border-gray-100 hover:bg-gray-50">
-                                            <td class="py-3 px-4 font-medium">
-                                                {{ $item->product->nama ?? 'Barang Dihapus' }}</td>
-                                            <td class="py-3 px-4 text-center font-bold text-gray-700">
-                                                {{ $item->jumlah_awal }}</td>
-                                            <td class="py-3 px-4">
-                                                <form action="{{ route('so-products.update', $item->id) }}"
-                                                    method="POST" class="flex items-center space-x-2">
-                                                    @csrf
-                                                    @method('PUT')
-                                                    <input type="number" name="jumlah_akhir"
-                                                        value="{{ $item->jumlah_akhir }}" required min="0"
-                                                        placeholder="Ketik stok fisik..."
-                                                        class="w-32 rounded border-gray-300 py-1 px-2 text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                        <form action="{{ route('stock-opnames.updateAll', $activeSO->id) }}" method="POST">
+                            @csrf
+                            @method('PUT')
 
-                                                    <button type="submit"
-                                                        class="bg-green-100 text-green-700 hover:bg-green-200 px-3 py-1 rounded text-sm font-semibold transition">
-                                                        Simpan
-                                                    </button>
+                            <div
+                                class="flex justify-between items-center mb-4 bg-blue-50 p-3 rounded-lg border border-blue-100">
+                                <p class="text-sm text-blue-800 font-medium">Ketik angka stok fisik di bawah, lalu tekan
+                                    tombol <b>Simpan Semua</b> untuk menyimpan sekaligus.</p>
+                                <button type="submit"
+                                    class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded shadow transition">
+                                    ✓ Simpan Semua Input
+                                </button>
+                            </div>
 
-                                                    @if (!is_null($item->jumlah_akhir))
-                                                        <span class="text-xs text-green-600">✓ Tersimpan</span>
-                                                    @endif
-                                                </form>
-                                            </td>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="bg-gray-100 border-b border-gray-200">
+                                            <th class="py-3 px-4 font-semibold text-sm text-gray-600">Nama Barang</th>
+                                            <th class="py-3 px-4 font-semibold text-sm text-gray-600 text-center">Stok
+                                                Sistem</th>
+                                            <th class="py-3 px-4 font-semibold text-sm text-gray-600">Input Stok Fisik
+                                                Aktual</th>
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($soProducts as $item)
+                                            <tr class="border-b border-gray-100 hover:bg-gray-50">
+                                                <td class="py-3 px-4 font-medium">
+                                                    {{ $item->product->nama ?? 'Barang Dihapus' }}</td>
+                                                <td class="py-3 px-4 text-center font-bold text-gray-700">
+                                                    {{ $item->jumlah_awal }}</td>
+                                                <td class="py-3 px-4">
+                                                    <div class="flex items-center space-x-3">
+                                                        <input type="number" name="items[{{ $item->id }}]"
+                                                            value="{{ $item->jumlah_akhir }}" min="0"
+                                                            placeholder="Ketik stok fisik..."
+                                                            class="w-32 rounded border-gray-300 py-1.5 px-3 text-sm focus:ring-indigo-500 focus:border-indigo-500 shadow-sm">
+
+                                                        @if (!is_null($item->jumlah_akhir))
+                                                            <span
+                                                                class="text-xs font-bold text-green-700 bg-green-100 px-2 py-1.5 rounded border border-green-200">
+                                                                Tersimpan: {{ $item->jumlah_akhir }}
+                                                            </span>
+                                                        @endif
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </form>
                     @endif
                 @endif
             </div>

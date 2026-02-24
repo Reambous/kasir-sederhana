@@ -126,4 +126,35 @@ class StockOpnameController extends Controller
             return back()->with('error', 'Terjadi kesalahan saat menyelesaikan Stock Opname.');
         }
     }
+
+    // --- FUNGSI BARU: Batal Stock Opname ---
+    public function cancel(\App\Models\StockOpname $stockOpname)
+    {
+        // Hapus daftar barang yang sedang diopname
+        $stockOpname->soProducts()->delete();
+        // Hapus sesi stock opname-nya
+        $stockOpname->delete();
+
+        return back()->with('success', 'Sesi Stock Opname berhasil dibatalkan dan dihapus.');
+    }
+
+    // --- FUNGSI BARU: Simpan Semua Input Sekaligus ---
+    public function updateAllItems(\Illuminate\Http\Request $request, \App\Models\StockOpname $stockOpname)
+    {
+        $request->validate([
+            'items' => 'required|array',
+            'items.*' => 'nullable|numeric|min:0',
+        ]);
+
+        // Looping semua inputan dan simpan ke database
+        foreach ($request->items as $id => $jumlahAkhir) {
+            if ($jumlahAkhir !== null) {
+                SoProduct::where('id', $id)
+                    ->where('stock_opname_id', $stockOpname->id)
+                    ->update(['jumlah_akhir' => $jumlahAkhir]);
+            }
+        }
+
+        return back()->with('success', 'Semua stok fisik aktual berhasil disimpan!');
+    }
 }

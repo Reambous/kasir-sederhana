@@ -16,9 +16,19 @@ use App\Http\Controllers\StockOpnameController;
 Route::view('/', 'welcome');
 
 // Halaman Dashboard bawaan Breeze (Mesin Kasir kita tampil di sini)
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+// Halaman Dashboard dengan Statistik
+Route::get('/dashboard', function () {
+    $totalProducts = \App\Models\Product::count();
+    $totalOrders = \App\Models\Order::whereDate('tanggal', now()->toDateString())->count();
+    $lowStock = \App\Models\Product::where('jumlah', '<', 10)->count();
+
+    return view('dashboard', compact('totalProducts', 'totalOrders', 'lowStock'));
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+// Halaman Khusus Mesin Kasir
+Route::view('/pos', 'pos')
+    ->middleware(['auth'])
+    ->name('pos');
 
 // Halaman Profile bawaan Breeze
 Route::view('profile', 'profile')
@@ -57,6 +67,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/stock-opnames/{stockOpname}/sync', [StockOpnameController::class, 'sync'])->name('stock-opnames.sync');
     Route::put('/so-products/{soProduct}', [StockOpnameController::class, 'updateItem'])->name('so-products.update');
     Route::post('/stock-opnames/{stockOpname}/finish', [StockOpnameController::class, 'finish'])->name('stock-opnames.finish');
+    Route::delete('/stock-opnames/{stockOpname}/cancel', [StockOpnameController::class, 'cancel'])->name('stock-opnames.cancel');
+    Route::put('/stock-opnames/{stockOpname}/update-all', [StockOpnameController::class, 'updateAllItems'])->name('stock-opnames.updateAll');
 });
 
 // Memuat route otentikasi (login, register, dll) bawaan Breeze
