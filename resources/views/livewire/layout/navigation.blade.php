@@ -35,7 +35,9 @@ new class extends Component {
                     <x-nav-link :href="route('pos')" :active="request()->routeIs('pos')" wire:navigate>
                         {{ __('Mesin Kasir') }}
                     </x-nav-link>
-
+                    <x-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')" wire:navigate>
+                        {{ __('Riwayat Transaksi') }}
+                    </x-nav-link>
                     <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')" wire:navigate>
                         {{ __('Gudang') }}
                     </x-nav-link>
@@ -118,6 +120,9 @@ new class extends Component {
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
                 {{ __('Mesin Kasir') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')" wire:navigate>
+                {{ __('Riwayat Transaksi') }}
             </x-responsive-nav-link>
 
             <x-responsive-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')" wire:navigate>

@@ -55,6 +55,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/tags/{tag}', [TagController::class, 'destroy'])->name('tags.destroy');
     Route::put('/tags/{tag}', [TagController::class, 'update'])->name('tags.update');
     // --- ROUTE KASIR (TRANSAKSI & INVOICE) ---
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::get('/orders/{order}/export', [OrderController::class, 'export'])->name('orders.export');
 
