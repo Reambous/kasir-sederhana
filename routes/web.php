@@ -39,15 +39,20 @@ Route::middleware('auth')->group(function () {
     Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
 
+    // --- ROUTE TAG (KATEGORI) ---
+    Route::get('/tags', [TagController::class, 'index'])->name('tags.index');
     Route::post('/tags', [TagController::class, 'store'])->name('tags.store');
-
-
+    Route::delete('/tags/{tag}', [TagController::class, 'destroy'])->name('tags.destroy');
+    Route::put('/tags/{tag}', [TagController::class, 'update'])->name('tags.update');
     // --- ROUTE KASIR (TRANSAKSI & INVOICE) ---
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::get('/orders/{order}/export', [OrderController::class, 'export'])->name('orders.export');
 
 
     // --- ROUTE STOCK OPNAME ---
+
+    Route::get('/stock-opnames', [StockOpnameController::class, 'index'])->name('stock-opnames.index'); // <-- TAMBAHKAN BARIS INI
+
     Route::post('/stock-opnames', [StockOpnameController::class, 'store'])->name('stock-opnames.store');
     Route::post('/stock-opnames/{stockOpname}/sync', [StockOpnameController::class, 'sync'])->name('stock-opnames.sync');
     Route::put('/so-products/{soProduct}', [StockOpnameController::class, 'updateItem'])->name('so-products.update');

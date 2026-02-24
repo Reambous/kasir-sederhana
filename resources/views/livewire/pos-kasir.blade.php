@@ -28,7 +28,21 @@
         <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Detail Pesanan</h3>
 
         @if (session()->has('success'))
-            <div class="p-3 mb-4 text-sm text-green-800 bg-green-100 rounded-lg">{{ session('success') }}</div>
+            <div class="p-4 mb-4 text-sm text-green-800 bg-green-100 rounded-lg border border-green-300">
+                <p class="font-bold mb-2">{{ session('success') }}</p>
+
+                @if ($lastOrderId)
+                    <a href="{{ route('orders.export', $lastOrderId) }}" target="_blank"
+                        class="inline-block bg-white text-green-700 font-bold py-1 px-4 border border-green-500 rounded hover:bg-green-50 transition">
+                        🖨️ Cetak Struk Terakhir
+                    </a>
+
+                    <button wire:click="$set('lastOrderId', null)"
+                        class="ml-2 inline-block text-gray-500 underline text-xs">
+                        Tutup
+                    </button>
+                @endif
+            </div>
         @endif
         @if (session()->has('error'))
             <div class="p-3 mb-4 text-sm text-red-800 bg-red-100 rounded-lg">{{ session('error') }}</div>

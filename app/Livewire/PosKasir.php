@@ -18,6 +18,7 @@ class PosKasir extends Component
     public $potongan = 0;
     public $metode_pembayaran = 'cash';
     public $nama_buyer = '';
+    public $lastOrderId = null;
 
     // Fungsi untuk menambah barang ke keranjang
     public function addToCart($productId)
@@ -82,7 +83,10 @@ class PosKasir extends Component
         }
 
         try {
-            DB::transaction(function () {
+            $newOrderId = null; // 1. BUAT PENAMPUNG KOSONG
+
+            // 2. TAMBAHKAN 'use (&$newOrderId)' AGAR ID BISA DIKELUARKAN DARI DALAM TRANSACTION
+            DB::transaction(function () use (&$newOrderId) {
                 $orderCode = 'INV-' . date('Ymd') . '-' . strtoupper(uniqid());
 
                 $order = Order::create([
@@ -95,6 +99,8 @@ class PosKasir extends Component
                     'status'            => 'done',
                     'user_id'           => Auth::id(),
                 ]);
+
+                $newOrderId = $order->id; // 3. SIMPAN ID TRANSAKSI YANG BARU JADI KE PENAMPUNG
 
                 foreach ($this->cart as $item) {
                     $product = Product::lockForUpdate()->find($item['id']);
@@ -116,6 +122,9 @@ class PosKasir extends Component
             $this->uang_diterima = 0;
             $this->potongan = 0;
             $this->nama_buyer = '';
+
+            // 4. MASUKKAN ID KE VARIABEL PUBLIK AGAR DIBACA OLEH HTML/BLADE
+            $this->lastOrderId = $newOrderId;
 
             session()->flash('success', 'Transaksi Berhasil!');
         } catch (Exception $e) {

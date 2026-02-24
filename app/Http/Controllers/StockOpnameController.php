@@ -11,6 +11,23 @@ use Exception;
 
 class StockOpnameController extends Controller
 {
+    public function index()
+    {
+        // 1. Cek apakah ada Stock Opname yang sedang berjalan (on_progress)
+        $activeSO = \App\Models\StockOpname::where('status', 'on_progress')->first();
+
+        // 2. Jika ada, ambil daftar barang yang sedang diopname
+        $soProducts = [];
+        if ($activeSO) {
+            // Menggunakan 'with' agar tidak query berulang-ulang ke tabel products
+            $soProducts = $activeSO->soProducts()->with('product')->get();
+        }
+
+        // 3. Ambil riwayat Stock Opname yang sudah selesai
+        $historySO = \App\Models\StockOpname::where('status', 'done')->latest()->get();
+
+        return view('stock-opnames.index', compact('activeSO', 'soProducts', 'historySO'));
+    }
     // Langkah 1: Klik Start Stock Opname
     public function store()
     {
