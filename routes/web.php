@@ -71,6 +71,7 @@ Route::middleware(['auth', 'role:gudang'])->group(function () {
     Route::post('/stock-opnames/{stockOpname}/finish', [StockOpnameController::class, 'finish'])->name('stock-opnames.finish');
     Route::delete('/stock-opnames/{stockOpname}/cancel', [StockOpnameController::class, 'cancel'])->name('stock-opnames.cancel');
     Route::put('/stock-opnames/{stockOpname}/update-all', [StockOpnameController::class, 'updateAllItems'])->name('stock-opnames.updateAll');
+    Route::get('/stock-opnames/{stockOpname}/detail', [\App\Http\Controllers\StockOpnameController::class, 'show'])->name('stock-opnames.show');
 });
 
 // Memuat route otentikasi (login, register, dll) bawaan Breeze

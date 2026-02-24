@@ -49,6 +49,14 @@ class StockOpnameController extends Controller
         return back()->with('success', 'Stock Opname berhasil dimulai!');
     }
 
+    // --- FUNGSI BARU: Lihat Detail Riwayat Stock Opname ---
+    public function show(\App\Models\StockOpname $stockOpname)
+    {
+        // Panggil data stock opname beserta rincian barangnya
+        $stockOpname->load('soProducts.product');
+
+        return view('stock-opnames.show', compact('stockOpname'));
+    }
     // Langkah 2: Klik Sync Data
     public function sync(StockOpname $stockOpname)
     {
@@ -141,20 +149,29 @@ class StockOpnameController extends Controller
     // --- FUNGSI BARU: Simpan Semua Input Sekaligus ---
     public function updateAllItems(\Illuminate\Http\Request $request, \App\Models\StockOpname $stockOpname)
     {
+        // 1. Validasi: Sekarang kita juga menerima array 'keterangan'
         $request->validate([
             'items' => 'required|array',
             'items.*' => 'nullable|numeric|min:0',
+            'keterangan' => 'nullable|array',
+            'keterangan.*' => 'nullable|string|max:255',
         ]);
 
-        // Looping semua inputan dan simpan ke database
+        // 2. Looping dan simpan stok beserta keterangannya
         foreach ($request->items as $id => $jumlahAkhir) {
             if ($jumlahAkhir !== null) {
-                SoProduct::where('id', $id)
+                // Ambil teks keterangan jika admin mengetiknya, jika tidak jadikan null
+                $ket = $request->keterangan[$id] ?? null;
+
+                \App\Models\SoProduct::where('id', $id)
                     ->where('stock_opname_id', $stockOpname->id)
-                    ->update(['jumlah_akhir' => $jumlahAkhir]);
+                    ->update([
+                        'jumlah_akhir' => $jumlahAkhir,
+                        'keterangan' => $ket // <-- Simpan keterangan ke database
+                    ]);
             }
         }
 
-        return back()->with('success', 'Semua stok fisik aktual berhasil disimpan!');
+        return back()->with('success', 'Semua stok fisik dan keterangan berhasil disimpan!');
     }
 }
