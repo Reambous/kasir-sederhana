@@ -25,7 +25,7 @@ class UpdateProductRequest extends FormRequest
             'jumlah'     => ['required', 'integer', 'min:0'],
             'tags'       => ['nullable', 'array'],
             'tags.*'     => ['exists:tags,id'],
-            'gambar'     => ['nullable', 'image', 'max:2048']
+            'gambar'     => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048']
         ];
     }
 

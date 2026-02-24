@@ -54,8 +54,19 @@ new class extends Component {
                     <x-slot name="trigger">
                         <button
                             class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <div x-data="{{ json_encode(['name' => auth()->user()->nama]) }}" x-text="name"
-                                x-on:profile-updated.window="name = $event.detail.name"></div>
+
+                            @if (auth()->user()->gambar)
+                                <img class="h-8 w-8 object-cover rounded-full mr-2"
+                                    src="{{ asset('storage/' . auth()->user()->gambar) }}" alt="Avatar">
+                            @else
+                                <div
+                                    class="h-8 w-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-bold mr-2 text-xs">
+                                    {{ substr(auth()->user()->nama, 0, 1) }}
+                                </div>
+                            @endif
+
+                            <div x-data="{{ json_encode(['nama' => auth()->user()->nama]) }}" x-text="nama"
+                                x-on:profile-updated.window="nama = $event.detail.nama"></div>
 
                             <div class="ms-1">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
@@ -123,8 +134,8 @@ new class extends Component {
         <!-- Responsive Settings Options -->
         <div class="pt-4 pb-1 border-t border-gray-200">
             <div class="px-4">
-                <div class="font-medium text-base text-gray-800" x-data="{{ json_encode(['name' => auth()->user()->nama]) }}" x-text="name"
-                    x-on:profile-updated.window="name = $event.detail.name"></div>
+                <div class="font-medium text-base text-gray-800" x-data="{{ json_encode(['nama' => auth()->user()->nama]) }}" x-text="nama"
+                    x-on:profile-updated.window="nama = $event.detail.nama"></div>
                 <div class="font-medium text-sm text-gray-500">{{ auth()->user()->email }}</div>
             </div>
 

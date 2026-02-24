@@ -107,7 +107,7 @@
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
                 <div x-show="showAdd"
                     class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                    <form action="{{ route('products.store') }}" method="POST">
+                    <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                             <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Input Barang Baru</h3>
@@ -115,6 +115,12 @@
                                 <div><label class="block text-sm font-medium text-gray-700">Nama</label><input
                                         type="text" name="nama" required
                                         class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Foto Barang
+                                        (Opsional)</label>
+                                    <input type="file" name="gambar" accept="image/*"
+                                        class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                                </div>
                                 <div><label class="block text-sm font-medium text-gray-700">Barcode</label><input
                                         type="text" name="barcode" required
                                         class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></div>
@@ -164,7 +170,7 @@
                 <div x-show="showEdit"
                     class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
 
-                    <form x-bind:action="editUrl" method="POST">
+                    <form x-bind:action="editUrl" method="POST" enctype="multipart/form-data">
                         @csrf
                         @method('PUT') <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                             <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Edit Data Barang</h3>
@@ -172,6 +178,12 @@
                                 <div><label class="block text-sm font-medium text-gray-700">Nama</label><input
                                         type="text" name="nama" x-model="form.nama" required
                                         class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Foto Barang
+                                        (Opsional)</label>
+                                    <input type="file" name="gambar" accept="image/*"
+                                        class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                                </div>
                                 <div><label class="block text-sm font-medium text-gray-700">Barcode</label><input
                                         type="text" name="barcode" x-model="form.barcode" required
                                         class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></div>

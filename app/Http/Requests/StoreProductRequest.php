@@ -21,7 +21,7 @@ class StoreProductRequest extends FormRequest
             'jumlah'     => ['required', 'integer', 'min:0'],
             'tags'       => ['nullable', 'array'], // Tag boleh kosong (nullable)
             'tags.*'     => ['exists:tags,id'],    // Pastikan ID tag benar-benar ada di database
-            'gambar'     => ['nullable', 'image', 'max:2048'] // Maksimal 2MB jika ada gambar
+            'gambar'     => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'] // Maksimal 2MB jika ada gambar
         ];
     }
 

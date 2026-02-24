@@ -58,10 +58,26 @@
         <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 h-[550px] overflow-y-auto pr-2">
             @forelse($products as $product)
                 <button wire:click="addToCart('{{ $product->id }}')"
-                    class="flex flex-col text-left bg-gray-50 p-4 rounded-lg border border-gray-200 hover:bg-indigo-50 hover:border-indigo-300 transition-colors focus:outline-none">
-                    <span class="font-semibold text-gray-800 truncate w-full">{{ $product->nama }}</span>
-                    <span class="text-sm text-gray-500 mb-2">Stok: {{ $product->jumlah }}</span>
-                    <span class="font-bold text-indigo-600 mt-auto">Rp
+                    class="flex flex-col text-left bg-white p-3 rounded-xl border border-gray-200 hover:border-indigo-400 hover:shadow-md transition-all focus:outline-none group overflow-hidden">
+
+                    <div
+                        class="w-full h-32 bg-gray-50 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
+                        @if ($product->gambar)
+                            <img src="{{ asset('storage/' . $product->gambar) }}" alt="{{ $product->nama }}"
+                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                        @else
+                            <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                            </svg>
+                        @endif
+                    </div>
+
+                    <span
+                        class="font-bold text-gray-800 text-sm leading-tight line-clamp-2 w-full">{{ $product->nama }}</span>
+                    <span class="text-xs text-gray-500 mt-1">Stok: {{ $product->jumlah }}</span>
+                    <span class="font-bold text-indigo-600 mt-auto pt-2">Rp
                         {{ number_format($product->harga_jual, 0, ',', '.') }}</span>
                 </button>
             @empty
