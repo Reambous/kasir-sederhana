@@ -56,10 +56,18 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 text-center border border-gray-100">
                 <h3 class="text-lg font-bold text-gray-800 mb-2">Selamat Datang, {{ auth()->user()->nama }}!</h3>
                 <p class="text-gray-500 mb-6">Gunakan menu navigasi di atas untuk mulai mengelola toko.</p>
-                <a href="{{ route('pos') }}"
-                    class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg shadow transition">
-                    Buka Mesin Kasir
-                </a>
+                @if (auth()->user()->role === 'kasir')
+                    <a href="{{ route('pos') }}"
+                        class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg shadow transition">
+                        Buka Mesin Kasir
+                    </a>
+                @endif
+                @if (auth()->user()->role === 'gudang')
+                    <a href="{{ route('products.index') }}"
+                        class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-lg shadow transition">
+                        Buka Gudang
+                    </a>
+                @endif
             </div>
         </div>
     </div>

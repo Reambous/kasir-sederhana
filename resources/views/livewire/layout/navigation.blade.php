@@ -32,21 +32,27 @@ new class extends Component {
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('pos')" :active="request()->routeIs('pos')" wire:navigate>
-                        {{ __('Mesin Kasir') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')" wire:navigate>
-                        {{ __('Riwayat Transaksi') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')" wire:navigate>
-                        {{ __('Gudang') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('stock-opnames.index')" :active="request()->routeIs('stock-opnames.*')" wire:navigate>
-                        {{ __('Stock Opname') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('tags.index')" :active="request()->routeIs('tags.*')" wire:navigate>
-                        {{ __('Kategori Tag') }}
-                    </x-nav-link>
+
+                    @if (auth()->user()->role === 'kasir')
+                        <x-nav-link :href="route('pos')" :active="request()->routeIs('pos')" wire:navigate>
+                            {{ __('Mesin Kasir') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')" wire:navigate>
+                            {{ __('Riwayat Transaksi') }}
+                        </x-nav-link>
+                    @endif
+
+                    @if (auth()->user()->role === 'gudang')
+                        <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')" wire:navigate>
+                            {{ __('Gudang') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('stock-opnames.index')" :active="request()->routeIs('stock-opnames.*')" wire:navigate>
+                            {{ __('Stock Opname') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('tags.index')" :active="request()->routeIs('tags.*')" wire:navigate>
+                            {{ __('Kategori Tag') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -118,22 +124,26 @@ new class extends Component {
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
-                {{ __('Mesin Kasir') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')" wire:navigate>
-                {{ __('Riwayat Transaksi') }}
-            </x-responsive-nav-link>
+            @if (auth()->user()->role === 'kasir')
+                <x-responsive-nav-link :href="route('pos')" :active="request()->routeIs('pos')" wire:navigate>
+                    {{ __('Mesin Kasir') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')" wire:navigate>
+                    {{ __('Riwayat Transaksi') }}
+                </x-responsive-nav-link>
+            @endif
 
-            <x-responsive-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')" wire:navigate>
-                {{ __('Gudang') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('stock-opnames.index')" :active="request()->routeIs('stock-opnames.*')" wire:navigate>
-                {{ __('Stock Opname') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('tags.index')" :active="request()->routeIs('tags.*')" wire:navigate>
-                {{ __('Kategori Tag') }}
-            </x-responsive-nav-link>
+            @if (auth()->user()->role === 'gudang')
+                <x-responsive-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')" wire:navigate>
+                    {{ __('Gudang') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('stock-opnames.index')" :active="request()->routeIs('stock-opnames.*')" wire:navigate>
+                    {{ __('Stock Opname') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('tags.index')" :active="request()->routeIs('tags.*')" wire:navigate>
+                    {{ __('Kategori Tag') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->
