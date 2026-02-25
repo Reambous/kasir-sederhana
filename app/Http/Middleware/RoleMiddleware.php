@@ -10,10 +10,11 @@ class RoleMiddleware
 {
     public function handle(Request $request, Closure $next, string $role): Response
     {
-        // Jika role user saat ini tidak sama dengan role yang diizinkan halaman
+        // Jika role user saat ini tidak sama dengan role yang diizinkan
         if ($request->user()->role !== $role) {
-            // Usir dengan error 403 (Forbidden)
-            abort(403, 'Akses Ditolak! Anda tidak memiliki izin untuk membuka halaman ini.');
+
+            // Alihkan kembali ke dashboard dengan pesan error
+            return redirect()->route('dashboard')->with('error', 'Akses ditolak! Anda tidak memiliki izin untuk masuk ke menu tersebut.');
         }
 
         return $next($request);

@@ -7,6 +7,12 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            @if (session('error'))
+                <div class="mb-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-sm" role="alert">
+                    <p class="font-bold">Peringatan Keamanan</p>
+                    <p>{{ session('error') }}</p>
+                </div>
+            @endif
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
 
                 <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-100 flex items-center">
