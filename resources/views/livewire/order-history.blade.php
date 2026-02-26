@@ -1,7 +1,10 @@
 <div class="space-y-6">
     <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-100 flex justify-between items-center">
         <div>
-            <h3 class="text-lg font-bold text-gray-800">Total Pendapatan</h3>
+            <h3 class="text-lg font-bold text-gray-800">Total Pendapatan
+
+            </h3>
+
             <p class="text-sm text-gray-500">
                 @if ($search)
                     Pencarian: <b class="text-indigo-600">"{{ $search }}"</b>
@@ -9,10 +12,20 @@
                     Dari keseluruhan transaksi.
                 @endif
             </p>
+            <div class="">
+                <button wire:click="deleteThisWeekOrders"
+                    wire:confirm="PERINGATAN: Semua transaksi MINGGU INI akan dihapus permanen dan stok akan dikembalikan. Lanjutkan?"
+                    class="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-4 py-2 rounded-lg text-xs font-bold transition border border-red-200 shadow-sm">
+                    🗑️ Hapus Transaksi Minggu Ini
+                </button>
+            </div>
         </div>
+
         <div class="text-3xl font-black text-green-600">
             Rp {{ number_format($totalPendapatan, 0, ',', '.') }}
+
         </div>
+
     </div>
 
     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 border border-gray-100">
@@ -91,11 +104,17 @@
                                     @endphp
                                     Rp {{ number_format($totalAkhir, 0, ',', '.') }}
                                 </td>
-                                <td class="py-3 px-4 text-center">
+                                <td class="py-3 px-4 text-center space-x-1">
                                     <a href="{{ route('orders.export', $order->id) }}" target="_blank"
                                         class="inline-block bg-white border border-gray-300 text-gray-700 hover:bg-gray-100 hover:text-indigo-600 font-semibold py-1 px-3 rounded text-sm transition">
                                         🖨️ Cetak
                                     </a>
+
+                                    <button wire:click="deleteOrder('{{ $order->id }}')"
+                                        wire:confirm="Hapus transaksi ini? Stok akan dikembalikan"
+                                        class="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white font-semibold py-1 px-3 rounded text-sm transition border border-red-200 shadow-sm">
+                                        🗑️ Hapus
+                                    </button>
                                 </td>
                             </tr>
                         @empty

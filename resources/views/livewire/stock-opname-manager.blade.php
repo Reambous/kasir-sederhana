@@ -95,8 +95,17 @@
                                     <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors"
                                         wire:key="item-row-{{ $item->id }}">
 
-                                        <td class="py-3 px-4 font-medium text-gray-800">
-                                            {{ $item->product->nama ?? 'Barang Dihapus' }}</td>
+                                        <td class="py-3 px-4">
+                                            <div class="flex flex-col">
+                                                <span class="font-semibold text-gray-800">
+                                                    {{ $item->product->nama ?? 'Barang Dihapus' }}
+                                                </span>
+                                                <span
+                                                    class="text-xs font-mono text-gray-500 bg-gray-100 px-1 py-0.5 rounded w-fit mt-1 border border-gray-200">
+                                                    {{ $item->product->barcode ?? '-' }}
+                                                </span>
+                                            </div>
+                                        </td>
                                         <td class="py-3 px-4 text-center font-bold text-gray-500">
                                             {{ $item->jumlah_awal }}</td>
 

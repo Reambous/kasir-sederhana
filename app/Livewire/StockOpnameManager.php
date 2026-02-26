@@ -54,7 +54,7 @@ class StockOpnameManager extends Component
             if ($this->searchActive) {
                 $queryActive->whereHas('product', function ($q) {
                     $q->where('nama', 'like', '%' . $this->searchActive . '%')
-                        ->orWhere('barcode', 'like', '%' . $this->searchActive . '%');
+                        ->orWhere('barcode', 'like', '%' . $this->searchActive . '%'); // Dukung cari pakai scan barcode
                 });
             }
             // Kita potong 10 baris per halaman (pakai nama page khusus agar tidak bentrok dengan riwayat)
