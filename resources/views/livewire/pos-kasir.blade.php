@@ -1,4 +1,4 @@
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
 
     <div class="md:col-span-2 bg-white rounded-lg shadow-sm p-6 border border-gray-100">
         <div class="flex justify-between items-center mb-4">
@@ -8,7 +8,6 @@
         </div>
 
         <div x-data="{ showTags: false }" class="mb-4 pb-3 border-b border-gray-100">
-
             <div class="flex items-center space-x-3">
                 <button @click="showTags = !showTags" type="button"
                     class="flex items-center text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg transition border border-gray-200 focus:outline-none shadow-sm">
@@ -17,9 +16,7 @@
                             d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
                         </path>
                     </svg>
-
                     Filter Kategori
-
                     <svg :class="{ 'rotate-180': showTags }" class="w-4 h-4 ml-2 transition-transform duration-200"
                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -52,14 +49,12 @@
                     <span class="text-sm text-gray-400">Belum ada kategori yang dibuat di menu Gudang.</span>
                 @endif
             </div>
-
         </div>
 
-        <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 h-[550px] overflow-y-auto pr-2">
+        <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
             @forelse($products as $product)
                 <button wire:click="addToCart('{{ $product->id }}')"
                     class="flex flex-col text-left bg-white p-3 rounded-xl border border-gray-200 hover:border-indigo-400 hover:shadow-md transition-all focus:outline-none group overflow-hidden">
-
                     <div
                         class="w-full h-32 bg-gray-50 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
                         @if ($product->gambar)
@@ -73,7 +68,6 @@
                             </svg>
                         @endif
                     </div>
-
                     <span
                         class="font-bold text-gray-800 text-sm leading-tight line-clamp-2 w-full">{{ $product->nama }}</span>
                     <span class="text-xs text-gray-500 mt-1">Stok: {{ $product->jumlah }}</span>
@@ -86,9 +80,14 @@
                 </div>
             @endforelse
         </div>
+
+        <div class="pt-4 border-t border-gray-100">
+            {{ $products->links() }}
+        </div>
     </div>
 
-    <div class="bg-white rounded-lg shadow-sm p-6 border border-gray-100 flex flex-col h-[680px]">
+    <div
+        class="bg-white rounded-lg shadow-sm p-6 border border-gray-100 flex flex-col sticky top-6 h-[calc(100vh-3rem)]">
         <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Detail Pesanan</h3>
 
         @if (session()->has('success'))
@@ -154,7 +153,8 @@
             <div class="flex space-x-2">
                 <div class="w-1/2">
                     <label class="block text-xs text-gray-500 mb-1">Metode</label>
-                    <select wire:model="metode_pembayaran" class="w-full text-sm rounded border-gray-300 py-1.5">
+                    <select wire:model.live="metode_pembayaran"
+                        class="w-full text-sm rounded border-gray-300 py-1.5 focus:ring-indigo-500 focus:border-indigo-500">
                         <option value="cash">Cash</option>
                         <option value="non_cash">Non Cash</option>
                     </select>
@@ -173,8 +173,14 @@
 
             <div>
                 <label class="block text-xs text-gray-500 mb-1">Uang Diterima (Rp)</label>
-                <input type="number" wire:model="uang_diterima"
-                    class="w-full text-lg font-bold text-green-600 rounded border-gray-300 py-2">
+                <input type="number" wire:model="uang_diterima" @if ($metode_pembayaran === 'non_cash') readonly @endif
+                    class="w-full text-lg font-bold text-green-600 rounded border-gray-300 py-2 focus:ring-green-500 focus:border-green-500 transition-colors 
+                    @if ($metode_pembayaran === 'non_cash') bg-gray-100 cursor-not-allowed @endif">
+
+                @if ($metode_pembayaran === 'non_cash')
+                    <p class="text-xs text-indigo-500 mt-1 italic">Nominal otomatis disesuaikan untuk pembayaran
+                        Non-Cash.</p>
+                @endif
             </div>
 
             <button wire:click="checkout"

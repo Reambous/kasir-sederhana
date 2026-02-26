@@ -14,11 +14,7 @@ class OrderController extends Controller
 {
     public function index()
     {
-        // Mengambil semua order, beserta data kasir (user) dan rincian barangnya (orderItems)
-        // Kita urutkan dari yang terbaru (latest)
-        $orders = \App\Models\Order::with(['user', 'items'])->latest()->get();
-
-        return view('orders.index', compact('orders'));
+        return view('orders.index');
     }
 
     public function store(StoreOrderRequest $request)

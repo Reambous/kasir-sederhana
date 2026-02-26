@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use Livewire\WithPagination;
 use App\Models\Product;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -21,6 +22,7 @@ class PosKasir extends Component
     public $metode_pembayaran = 'cash';
     public $nama_buyer = '';
     public $lastOrderId = null;
+    use WithPagination;
 
     // --- FUNGSI KERANJANG SEBELUMNYA (TETAP SAMA) ---
     public function addToCart($productId)
@@ -46,6 +48,7 @@ class PosKasir extends Component
                 'jumlah' => 1,
             ];
         }
+        $this->syncUangDiterima();
     }
 
     public function decreaseQty($productId)
@@ -55,6 +58,7 @@ class PosKasir extends Component
         } else {
             unset($this->cart[$productId]);
         }
+        $this->syncUangDiterima();
     }
 
     // --- FUNGSI BARU UNTUK KETIK MANUAL & HAPUS BARANG ---
@@ -65,6 +69,7 @@ class PosKasir extends Component
         if (isset($this->cart[$productId])) {
             unset($this->cart[$productId]);
         }
+        $this->syncUangDiterima();
     }
 
     // Fungsi Update saat kasir mengetik angka
@@ -87,6 +92,7 @@ class PosKasir extends Component
                 $this->cart[$productId]['jumlah'] = $qty;
             }
         }
+        $this->syncUangDiterima();
     }
 
     // --- FUNGSI TOTAL & CHECKOUT SEBELUMNYA (TETAP SAMA) ---
@@ -157,6 +163,39 @@ class PosKasir extends Component
             session()->flash('error', 'Gagal memproses transaksi: ' . $e->getMessage());
         }
     }
+    // Fungsi ini akan otomatis berjalan saat Dropdown Metode Pembayaran diubah
+    public function updatedMetodePembayaran($value)
+    {
+        if ($value === 'non_cash') {
+            $this->uang_diterima = $this->total;
+        } else {
+            $this->uang_diterima = 0; // Kosongkan kembali jika pilih Cash
+        }
+    }
+
+    // Fungsi ini berjalan saat kasir mengetik angka potongan/diskon
+    public function updatedPotongan()
+    {
+        $this->syncUangDiterima();
+    }
+
+    // Fungsi pembantu untuk menyamakan uang diterima dengan total
+    private function syncUangDiterima()
+    {
+        if ($this->metode_pembayaran === 'non_cash') {
+            $this->uang_diterima = $this->total;
+        }
+    }
+
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingSelectedTags()
+    {
+        $this->resetPage();
+    }
 
     public function render()
     {
@@ -176,7 +215,7 @@ class PosKasir extends Component
             });
         }
 
-        $products = $query->get();
+        $products = $query->paginate(12);
 
         return view('livewire.pos-kasir', [
             'products' => $products,
