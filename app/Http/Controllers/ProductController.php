@@ -13,13 +13,7 @@ class ProductController extends Controller
 {
     public function index()
     {
-        // Mengambil semua produk diurutkan dari yang terbaru
-        $products = \App\Models\Product::latest()->get();
-
-        // Mengambil tag jika nanti ingin dikembangkan
-        $tags = \App\Models\Tag::all();
-
-        return view('products.index', compact('products', 'tags'));
+        return view('products.index');
     }
 
     public function store(StoreProductRequest $request)
