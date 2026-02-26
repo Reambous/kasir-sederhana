@@ -22,9 +22,14 @@ class ProductController extends Controller
 
         // JIKA ADA FILE GAMBAR YANG DIUPLOAD
         if ($request->hasFile('gambar')) {
-            // Simpan ke folder 'products' di dalam public storage
             $data['gambar'] = $request->file('gambar')->store('products', 'public');
         }
+
+        // ==========================================
+        // DUA BARIS PENYELAMAT DATABASE
+        // ==========================================
+        $data['tanggal_masuk'] = now();
+        $data['user_id'] = Auth::id(); // Mengambil ID dari akun yang sedang login saat ini
 
         $product = Product::create($data);
 

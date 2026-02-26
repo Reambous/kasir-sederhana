@@ -12,7 +12,12 @@
     @endif
     @if ($errors->any())
         <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-            Terdapat kesalahan pada input form Anda. Pastikan barcode tidak kembar dan data terisi benar.
+            <strong class="font-bold">Oops! Terdapat kesalahan:</strong>
+            <ul class="mt-2 list-disc list-inside text-sm">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
         </div>
     @endif
 
@@ -154,18 +159,43 @@
                             <div><label class="block text-sm font-medium text-gray-700">Jumlah Awal</label><input
                                     type="number" name="jumlah" required
                                     class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></div>
-                            <div>
+                            <div x-data="{ searchTag: '' }">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Kategori Tag
                                     (Opsional)</label>
-                                <div class="flex flex-wrap gap-2">
-                                    @foreach ($tags as $tag)
+
+                                <div class="relative mb-2">
+                                    <div class="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+                                        <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                        </svg>
+                                    </div>
+                                    <input type="text" x-model="searchTag" placeholder="Cari kategori..."
+                                        class="w-full pl-8 py-1.5 text-sm border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                                </div>
+
+                                <div
+                                    class="flex flex-col gap-1 max-h-40 overflow-y-auto p-2 border border-gray-200 rounded-md bg-gray-50 shadow-inner">
+                                    @forelse ($tags as $tag)
                                         <label
-                                            class="inline-flex items-center bg-white border border-gray-300 px-3 py-1 rounded-full cursor-pointer hover:bg-indigo-50 transition">
+                                            class="inline-flex items-center cursor-pointer hover:bg-indigo-100 px-2 py-1.5 rounded transition-colors"
+                                            x-show="searchTag === '' || '{{ strtolower(addslashes($tag->nama)) }}'.includes(searchTag.toLowerCase())">
+
                                             <input type="checkbox" name="tags[]" value="{{ $tag->id }}"
-                                                class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                                            <span class="ml-2 text-sm text-gray-700">{{ $tag->nama }}</span>
+                                                class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 w-4 h-4">
+                                            <span
+                                                class="ml-2 text-sm text-gray-700 font-medium">{{ $tag->nama }}</span>
                                         </label>
-                                    @endforeach
+                                    @empty
+                                        <span class="text-sm text-gray-400 italic px-2 py-1">Belum ada kategori yang
+                                            dibuat.</span>
+                                    @endforelse
+
+                                    <div x-show="searchTag !== ''" class="text-xs text-gray-500 text-center py-2"
+                                        style="display: none;">
+                                        Tidak menemukan tag? <br> Buat dulu di menu Kategori.
+                                    </div>
                                 </div>
                             </div>
                         </div>

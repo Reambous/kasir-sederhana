@@ -24,13 +24,22 @@ class ProductInventory extends Component
         // Panggil semua tag untuk ditampilkan di form Tambah/Edit
         $tags = Tag::all();
 
-        // Query pencarian barang berdasarkan nama atau barcode
-        $query = Product::with('tags')->latest();
+        // Query pencarian barang
+        $query = Product::with('tags');
 
         if ($this->search) {
-            $query->where('nama', 'like', '%' . $this->search . '%')
-                ->orWhere('barcode', 'like', '%' . $this->search . '%');
+            $query->where(function ($q) {
+                $q->where('nama', 'like', '%' . $this->search . '%')
+                    ->orWhere('barcode', 'like', '%' . $this->search . '%');
+            });
         }
+
+        // ==========================================
+        // FITUR BARU: URUTKAN STOK HABIS/SEDIKIT KE ATAS
+        // ==========================================
+        // Prioritas 1: Urutkan dari jumlah stok paling kecil (0) ke paling besar
+        // Prioritas 2: Jika stoknya sama, urutkan berdasarkan yang paling baru ditambahkan (latest)
+        $query->orderBy('jumlah', 'asc')->latest();
 
         // Potong data menjadi 10 baris per halaman
         $products = $query->paginate(10);

@@ -105,7 +105,8 @@
         @endif
         @if (session()->has('error'))
             <div class="p-3 mb-4 text-sm text-red-800 bg-red-100 rounded-lg border border-red-300">
-                {{ session('error') }}</div>
+                {{ session('error') }}
+            </div>
         @endif
 
         <div class="flex-1 overflow-y-auto mb-4 pr-2 space-y-3">
@@ -121,10 +122,10 @@
                         <button wire:click="decreaseQty('{{ $id }}')"
                             class="bg-gray-200 text-gray-700 px-2 py-1 rounded hover:bg-gray-300 transition">-</button>
 
-                        <input type="number" wire:change="updateQty('{{ $id }}', $event.target.value)"
+                        <input type="number" wire:key="qty-{{ $id }}-{{ $item['jumlah'] }}"
+                            wire:change="updateQty('{{ $id }}', $event.target.value)"
                             value="{{ $item['jumlah'] }}" min="1"
                             class="w-14 text-center text-sm border-gray-300 rounded py-1 focus:ring-indigo-500 focus:border-indigo-500">
-
                         <button wire:click="addToCart('{{ $id }}')"
                             class="bg-gray-200 text-gray-700 px-2 py-1 rounded hover:bg-gray-300 transition">+</button>
 
@@ -147,7 +148,8 @@
         <div class="border-t pt-4 space-y-3">
             <div>
                 <label class="block text-xs text-gray-500 mb-1">Nama Pembeli (Opsional)</label>
-                <input type="text" wire:model="nama_buyer" class="w-full text-sm rounded border-gray-300 py-1.5">
+                <input type="text" wire:model="nama_buyer"
+                    class="w-full text-sm rounded border-gray-300 py-1.5 focus:ring-indigo-500 focus:border-indigo-500">
             </div>
 
             <div class="flex space-x-2">
@@ -162,7 +164,7 @@
                 <div class="w-1/2">
                     <label class="block text-xs text-gray-500 mb-1">Potongan (Rp)</label>
                     <input type="number" wire:model.live="potongan"
-                        class="w-full text-sm rounded border-gray-300 py-1.5">
+                        class="w-full text-sm rounded border-gray-300 py-1.5 focus:ring-indigo-500 focus:border-indigo-500">
                 </div>
             </div>
 
@@ -171,9 +173,23 @@
                 <span>Rp {{ number_format($this->total, 0, ',', '.') }}</span>
             </div>
 
-            <div>
+            <div x-data="{
+                rawUang: $wire.entangle('uang_diterima').live,
+                get formattedUang() {
+                    return this.rawUang ? new Intl.NumberFormat('id-ID').format(this.rawUang) : '';
+                },
+                updateUang(event) {
+                    // Hapus semua karakter selain angka
+                    let val = event.target.value.replace(/\D/g, '');
+                    // Simpan angka murninya ke Livewire
+                    this.rawUang = val ? parseInt(val) : 0;
+                    // Format ulang tampilan dengan titik
+                    event.target.value = this.rawUang ? new Intl.NumberFormat('id-ID').format(this.rawUang) : '';
+                }
+            }">
                 <label class="block text-xs text-gray-500 mb-1">Uang Diterima (Rp)</label>
-                <input type="number" wire:model="uang_diterima" @if ($metode_pembayaran === 'non_cash') readonly @endif
+                <input type="text" :value="formattedUang" @input="updateUang"
+                    @if ($metode_pembayaran === 'non_cash') readonly @endif placeholder="Contoh: 100.000"
                     class="w-full text-lg font-bold text-green-600 rounded border-gray-300 py-2 focus:ring-green-500 focus:border-green-500 transition-colors 
                     @if ($metode_pembayaran === 'non_cash') bg-gray-100 cursor-not-allowed @endif">
 
@@ -183,10 +199,33 @@
                 @endif
             </div>
 
-            <button wire:click="checkout"
-                class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition-colors mt-2">
-                PROSES PEMBAYARAN
-            </button>
+            <div class="flex space-x-2 mt-4">
+
+                <button wire:click="clearCart" onclick="return confirm('Yakin ingin membatalkan semua pesanan ini?')"
+                    class="w-1/3 bg-red-50 text-red-600 border border-red-200 font-bold py-2 text-sm rounded-lg hover:bg-red-100 transition-all active:scale-95">
+                    BATAL
+                </button>
+
+                <button wire:click="checkout" wire:loading.attr="disabled"
+                    wire:loading.class="opacity-75 cursor-wait"
+                    class="relative w-2/3 bg-indigo-600 text-white font-bold py-2 text-sm rounded-lg hover:bg-indigo-700 transition-all shadow-md active:scale-95 flex justify-center items-center">
+
+                    <span wire:loading.remove wire:target="checkout">PROSES BAYAR</span>
+
+                    <span wire:loading wire:target="checkout" class="flex items-center">
+                        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg"
+                            fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                            </path>
+                        </svg>
+                        Memproses...
+                    </span>
+
+                </button>
+            </div>
         </div>
     </div>
 </div>

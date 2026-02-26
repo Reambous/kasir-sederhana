@@ -7,26 +7,27 @@ use Livewire\WithPagination;
 use App\Models\Product;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\Tag; // Tambahkan ini untuk memanggil Tag
+use App\Models\Tag;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Exception;
 
 class PosKasir extends Component
 {
+    use WithPagination;
+
     public $search = '';
-    public $selectedTags = []; // <-- Variabel penampung Tag yang dicentang
+    public $selectedTags = [];
     public $cart = [];
     public $uang_diterima = 0;
     public $potongan = 0;
     public $metode_pembayaran = 'cash';
     public $nama_buyer = '';
     public $lastOrderId = null;
-    use WithPagination;
 
-    // --- FUNGSI KERANJANG SEBELUMNYA (TETAP SAMA) ---
+    // --- 1. UPDATE: CEGAT KELEBIHAN STOK SAAT KLIK [+] ---
     public function addToCart($productId)
-    { /* ... isi dari fungsi sebelumnya biarkan sama ... */
+    {
         $product = Product::find($productId);
 
         if (!$product || $product->jumlah <= 0) {
@@ -35,8 +36,9 @@ class PosKasir extends Component
         }
 
         if (array_key_exists($productId, $this->cart)) {
+            // Cek apakah jumlah di keranjang sudah mencapai batas stok
             if ($this->cart[$productId]['jumlah'] >= $product->jumlah) {
-                session()->flash('error', 'Stok tidak mencukupi!');
+                session()->flash('error', 'Stok ' . $product->nama . ' hanya tersisa ' . $product->jumlah . '!');
                 return;
             }
             $this->cart[$productId]['jumlah']++;
@@ -52,7 +54,7 @@ class PosKasir extends Component
     }
 
     public function decreaseQty($productId)
-    { /* ... isi fungsi sebelumnya ... */
+    {
         if ($this->cart[$productId]['jumlah'] > 1) {
             $this->cart[$productId]['jumlah']--;
         } else {
@@ -61,9 +63,6 @@ class PosKasir extends Component
         $this->syncUangDiterima();
     }
 
-    // --- FUNGSI BARU UNTUK KETIK MANUAL & HAPUS BARANG ---
-
-    // Fungsi Hapus total dari keranjang
     public function removeItem($productId)
     {
         if (isset($this->cart[$productId])) {
@@ -72,10 +71,10 @@ class PosKasir extends Component
         $this->syncUangDiterima();
     }
 
-    // Fungsi Update saat kasir mengetik angka
+    // --- 2. UPDATE: CEGAT KETIK MANUAL MELEBIHI STOK / MINUS ---
     public function updateQty($productId, $qty)
     {
-        $qty = (int) $qty; // Pastikan jadi angka
+        $qty = (int) $qty;
 
         if ($qty <= 0) {
             $this->removeItem($productId);
@@ -85,9 +84,9 @@ class PosKasir extends Component
         $product = Product::find($productId);
         if ($product) {
             if ($qty > $product->jumlah) {
-                // Jika ketik melebihi stok, mentokkan ke maksimal stok
-                session()->flash('error', 'Stok ' . $product->nama . ' hanya tersisa ' . $product->jumlah . '!');
-                $this->cart[$productId]['jumlah'] = $product->jumlah;
+                // Beri peringatan, TAPI biarkan angka yang diketik tetap masuk ke keranjang
+                session()->flash('error', 'Peringatan! Ketikanmu melebihi stok ' . $product->nama . ' (Sisa: ' . $product->jumlah . ').');
+                $this->cart[$productId]['jumlah'] = $qty;
             } else {
                 $this->cart[$productId]['jumlah'] = $qty;
             }
@@ -95,7 +94,18 @@ class PosKasir extends Component
         $this->syncUangDiterima();
     }
 
-    // --- FUNGSI TOTAL & CHECKOUT SEBELUMNYA (TETAP SAMA) ---
+    // --- 3. FITUR BARU: KOSONGKAN KERANJANG (BATAL) ---
+    public function clearCart()
+    {
+        $this->cart = [];
+        $this->nama_buyer = '';
+        $this->potongan = 0;
+        $this->uang_diterima = 0;
+        $this->metode_pembayaran = 'cash';
+
+        session()->flash('success', 'Keranjang berhasil dibatalkan dan dikosongkan.');
+    }
+
     public function getTotalProperty()
     {
         $total = 0;
@@ -107,11 +117,30 @@ class PosKasir extends Component
 
     public function checkout()
     {
-        // ... (Isi fungsi checkout persis seperti yang terakhir kita buat dengan $newOrderId) ...
         if (empty($this->cart)) {
             session()->flash('error', 'Keranjang kosong!');
             return;
         }
+
+        // ==========================================
+        // SATPAM TERAKHIR: Hanya Peringatkan & Tolak!
+        // ==========================================
+        foreach ($this->cart as $item) {
+            $product = Product::find($item['id']);
+
+            if (!$product) {
+                session()->flash('error', 'Transaksi Dibatalkan! Barang ' . $item['nama'] . ' sudah tidak ada di gudang.');
+                return;
+            }
+
+            // Jika jumlah di keranjang melebihi stok gudang
+            if ($item['jumlah'] > $product->jumlah) {
+                // Munculkan error dan langsung HENTIKAN proses bayar
+                session()->flash('error', 'GAGAL BAYAR! Stok ' . $item['nama'] . ' tidak cukup (Sisa: ' . $product->jumlah . '). Tolong kurangi jumlahnya secara manual.');
+                return;
+            }
+        }
+        // ==========================================
 
         if ($this->uang_diterima < $this->total) {
             session()->flash('error', 'Uang tidak cukup!');
@@ -163,23 +192,21 @@ class PosKasir extends Component
             session()->flash('error', 'Gagal memproses transaksi: ' . $e->getMessage());
         }
     }
-    // Fungsi ini akan otomatis berjalan saat Dropdown Metode Pembayaran diubah
+
     public function updatedMetodePembayaran($value)
     {
         if ($value === 'non_cash') {
             $this->uang_diterima = $this->total;
         } else {
-            $this->uang_diterima = 0; // Kosongkan kembali jika pilih Cash
+            $this->uang_diterima = 0;
         }
     }
 
-    // Fungsi ini berjalan saat kasir mengetik angka potongan/diskon
     public function updatedPotongan()
     {
         $this->syncUangDiterima();
     }
 
-    // Fungsi pembantu untuk menyamakan uang diterima dengan total
     private function syncUangDiterima()
     {
         if ($this->metode_pembayaran === 'non_cash') {
@@ -199,16 +226,13 @@ class PosKasir extends Component
 
     public function render()
     {
-        // 1. Ambil semua Tag untuk ditampilkan di tombol filter
         $allTags = Tag::all();
 
-        // 2. Query Pencarian Barang (Sekarang mendukung Filter Tag)
         $query = Product::where(function ($q) {
             $q->where('nama', 'like', '%' . $this->search . '%')
                 ->orWhere('barcode', 'like', '%' . $this->search . '%');
         });
 
-        // Jika ada Tag yang dicentang, filter produk yang punya Tag tersebut
         if (!empty($this->selectedTags)) {
             $query->whereHas('tags', function ($q) {
                 $q->whereIn('tags.id', $this->selectedTags);
