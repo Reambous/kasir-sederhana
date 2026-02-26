@@ -11,8 +11,7 @@ class TagController extends Controller
     // Menampilkan halaman daftar Tag
     public function index()
     {
-        $tags = Tag::latest()->get();
-        return view('tags.index', compact('tags'));
+        return view('tags.index');
     }
 
     // Fungsi menyimpan Tag (Sudah kita buat sebelumnya)

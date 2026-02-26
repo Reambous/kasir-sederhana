@@ -13,20 +13,8 @@ class StockOpnameController extends Controller
 {
     public function index()
     {
-        // 1. Cek apakah ada Stock Opname yang sedang berjalan (on_progress)
-        $activeSO = \App\Models\StockOpname::where('status', 'on_progress')->first();
-
-        // 2. Jika ada, ambil daftar barang yang sedang diopname
-        $soProducts = [];
-        if ($activeSO) {
-            // Menggunakan 'with' agar tidak query berulang-ulang ke tabel products
-            $soProducts = $activeSO->soProducts()->with('product')->get();
-        }
-
-        // 3. Ambil riwayat Stock Opname yang sudah selesai
-        $historySO = \App\Models\StockOpname::where('status', 'done')->latest()->get();
-
-        return view('stock-opnames.index', compact('activeSO', 'soProducts', 'historySO'));
+        // Langsung tampilkan view
+        return view('stock-opnames.index');
     }
     // Langkah 1: Klik Start Stock Opname
     public function store()
@@ -52,9 +40,7 @@ class StockOpnameController extends Controller
     // --- FUNGSI BARU: Lihat Detail Riwayat Stock Opname ---
     public function show(\App\Models\StockOpname $stockOpname)
     {
-        // Panggil data stock opname beserta rincian barangnya
-        $stockOpname->load('soProducts.product');
-
+        // Cukup lemparkan ID ke view, Livewire yang akan memprosesnya
         return view('stock-opnames.show', compact('stockOpname'));
     }
     // Langkah 2: Klik Sync Data
