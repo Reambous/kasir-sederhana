@@ -42,7 +42,7 @@ class ProductInventory extends Component
         $query->orderBy('jumlah', 'asc')->latest();
 
         // Potong data menjadi 10 baris per halaman
-        $products = $query->paginate(10);
+        $products = $query->paginate(20);
 
         return view('livewire.product-inventory', [
             'products' => $products,

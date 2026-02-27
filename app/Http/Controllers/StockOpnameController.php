@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Exception;
 
+
 class StockOpnameController extends Controller
 {
     public function index()
@@ -19,22 +20,39 @@ class StockOpnameController extends Controller
     // Langkah 1: Klik Start Stock Opname
     public function store()
     {
-        // Cek apakah ada SO yang masih berjalan (Mencegah error ganda)
-        $onProgress = StockOpname::where('status', 'on_progress')->exists();
+        // 1. Cek apakah ada SO yang masih berjalan
+        $onProgress = \App\Models\StockOpname::where('status', 'on_progress')->exists();
 
         if ($onProgress) {
             return back()->with('error', 'Ada stock opname yang masih berjalan!');
         }
 
-        // Buat SO baru
+        // 2. Buat SO baru
         $code = 'SO-' . date('Ymd') . '-' . strtoupper(uniqid());
-        $so = StockOpname::create([
-            'code'          => $code,
-            'tanggal_mulai' => now()->toDateString(),
-            'status'        => 'on_progress'
-        ]);
 
-        return back()->with('success', 'Stock Opname berhasil dimulai!');
+        // Gunakan Transaction agar jika gagal di tengah jalan, data tidak kotor
+        DB::transaction(function () use ($code) {
+            $so = StockOpname::create([
+                'code'          => $code,
+                'tanggal_mulai' => now()->toDateString(),
+                'status'        => 'on_progress'
+            ]);
+
+            // 3. AMBIL SEMUA PRODUK DAN MASUKKAN KE TABEL SO_PRODUCTS (PENTING!)
+            $products = Product::all();
+
+            foreach ($products as $product) {
+                SoProduct::create([
+                    'stock_opname_id' => $so->id,
+                    'product_id'      => $product->id,
+                    'jumlah_awal'     => $product->jumlah, // Stok sistem saat ini
+                    'jumlah_akhir'    => null,             // Menunggu input fisik admin
+                    'keterangan'      => null
+                ]);
+            }
+        });
+
+        return back()->with('success', 'Stock Opname berhasil dimulai dan data barang telah disinkronkan!');
     }
 
     // --- FUNGSI BARU: Lihat Detail Riwayat Stock Opname ---

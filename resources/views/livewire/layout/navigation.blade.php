@@ -77,11 +77,23 @@ new class extends Component {
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button
-                            class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-bold rounded-none text-slate-300 bg-slate-900 hover:text-white focus:outline-none transition ease-in-out duration-150 uppercase tracking-widest">
-                            <div x-data="{{ json_encode(['name' => auth()->user()->nama]) }}" x-text="name"
-                                x-on:profile-updated.window="name = $event.detail.name"></div>
+                            class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-black uppercase tracking-widest text-slate-300 hover:text-white focus:outline-none transition ease-in-out duration-150">
 
-                            <div class="ml-1">
+                            <div class="mr-3">
+                                @if (Auth::user()->gambar)
+                                    <img src="{{ asset('storage/' . Auth::user()->gambar) }}"
+                                        class="w-8 h-8 rounded-none border-2 border-indigo-500 object-cover shadow-[2px_2px_0px_rgba(0,0,0,1)]">
+                                @else
+                                    <div
+                                        class="w-8 h-8 bg-slate-700 border-2 border-indigo-500 flex items-center justify-center text-[10px] font-black text-indigo-400 shadow-[2px_2px_0px_rgba(0,0,0,1)]">
+                                        {{ substr(Auth::user()->nama, 0, 1) }}
+                                    </div>
+                                @endif
+                            </div>
+
+                            <div>{{ Auth::user()->nama }}</div>
+
+                            <div class="ms-1">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
                                     viewBox="0 0 20 20">
                                     <path fill-rule="evenodd"

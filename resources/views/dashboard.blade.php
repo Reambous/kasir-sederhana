@@ -176,6 +176,94 @@
 
             </div>
         </div>
+        <div class="w-full space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-0 bg-slate-300 border-2 border-slate-900">
+                <div class="bg-white p-6 border-r-2 border-slate-900 md:border-b-0 border-b-2">
+                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Total Transaksi</p>
+                    <h4 class="text-4xl font-black text-slate-900 leading-none">
+                        {{ \App\Models\Order::count() }}
+                    </h4>
+                </div>
+                <div class="bg-white p-6 border-r-2 border-slate-900 md:border-b-0 border-b-2">
+                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Total Produk</p>
+                    <h4 class="text-4xl font-black text-slate-900 leading-none">
+                        {{ \App\Models\Product::count() }}
+                    </h4>
+                </div>
+                <div class="bg-white p-6">
+                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Sesi Opname</p>
+                    <h4 class="text-4xl font-black text-slate-900 leading-none">
+                        {{ \App\Models\StockOpname::where('status', 'done')->count() }}
+                    </h4>
+                </div>
+            </div>
+
+            <div class="bg-white border-2 border-slate-900 rounded-none overflow-hidden">
+                <div class="p-4 bg-slate-900 border-b-2 border-indigo-600 flex justify-between items-center">
+                    <h3 class="text-xs font-black text-white uppercase tracking-[0.2em]">Log Transaksi Terbaru</h3>
+
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse whitespace-nowrap">
+                        <thead class="bg-slate-100 border-b-2 border-slate-900">
+                            <tr>
+                                <th
+                                    class="py-3 px-6 text-[10px] font-black text-slate-600 uppercase tracking-widest border-r border-slate-200">
+                                    Invoice</th>
+                                <th
+                                    class="py-3 px-6 text-[10px] font-black text-slate-600 uppercase tracking-widest border-r border-slate-200">
+                                    Kasir</th>
+                                <th
+                                    class="py-3 px-6 text-[10px] font-black text-slate-600 uppercase tracking-widest border-r border-slate-200">
+                                    Waktu</th>
+                                <th
+                                    class="py-3 px-6 text-[10px] font-black text-slate-600 uppercase tracking-widest text-right">
+                                    Total</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200">
+                            @forelse($recentOrders as $order)
+                                {{-- Update bagian <tr> agar lebih kaku --}}
+                                <tr class="hover:bg-slate-500 hover:text-white group transition-none">
+                                    <td
+                                        class="py-3 px-6 text-xs font-black text-indigo-600 group-hover:text-indigo-400 border-r border-slate-200 uppercase">
+                                        {{ $order->code }}
+                                    </td>
+                                    <td
+                                        class="py-3 px-6 text-xs font-bold text-slate-800 group-hover:text-white uppercase border-r border-slate-200">
+                                        {{ $order->user->nama ?? 'Sistem' }}
+                                    </td>
+                                    <td
+                                        class="py-3 px-6 text-[11px] font-bold text-slate-400 border-r border-slate-200">
+                                        {{ $order->created_at->format('H:i') }}
+                                    </td>
+                                    <td class="py-3 px-6 text-xs font-black text-slate-900 text-right">
+                                        @php
+                                            // Hitung total dari semua item di dalam order ini
+                                            $totalBelanja = $order->items->sum(function ($item) {
+                                                return $item->harga_jual * $item->jumlah;
+                                            });
+
+                                            // Kurangi dengan potongan yang ada di model Order
+                                            $totalAkhir = $totalBelanja - ($order->potongan ?? 0);
+                                        @endphp
+
+                                        Rp{{ number_format($totalAkhir, 0, ',', '.') }}
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4"
+                                        class="py-12 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                        Belum ada data masuk</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
     </div>
 </x-app-layout>

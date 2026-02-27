@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class SoProduct extends Model
 {
     use HasFactory;
-
-    protected $fillable = ['stock_opname_id', 'product_id', 'jumlah_awal', 'jumlah_akhir'];
+    protected $table = 'so_products';
+    protected $fillable = ['stock_opname_id', 'product_id', 'jumlah_awal', 'jumlah_akhir', 'keterangan'];
 
     // Relasi: SoProduct dimiliki oleh 1 Stock Opname
     public function stockOpname()

@@ -5,6 +5,7 @@ use App\Http\Controllers\TagController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\StockOpnameController;
+use App\Models\Order;
 
 
 /*
@@ -21,8 +22,9 @@ Route::get('/dashboard', function () {
     $totalProducts = \App\Models\Product::count();
     $totalOrders = \App\Models\Order::whereDate('tanggal', now()->toDateString())->count();
     $lowStock = \App\Models\Product::where('jumlah', '<', 10)->count();
+    $recentOrders = Order::latest()->take(5)->get();
 
-    return view('dashboard', compact('totalProducts', 'totalOrders', 'lowStock'));
+    return view('dashboard', compact('totalProducts', 'totalOrders', 'lowStock', 'recentOrders'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 // Halaman Profile bawaan Breeze

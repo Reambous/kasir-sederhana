@@ -15,6 +15,6 @@ class StockOpname extends Model
     // Relasi: 1 Stock Opname berisi banyak SoProduct
     public function soProducts()
     {
-        return $this->hasMany(SoProduct::class);
+        return $this->hasMany(SoProduct::class, 'stock_opname_id');
     }
 }

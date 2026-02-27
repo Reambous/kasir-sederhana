@@ -1,80 +1,125 @@
-<div class="space-y-6">
+<div class="w-full space-y-4">
     <div
-        class="bg-white rounded-lg shadow-sm p-6 border border-gray-100 flex flex-col md:flex-row justify-between md:items-center space-y-4 md:space-y-0">
+        class="bg-slate-900 text-white border-b-4 border-emerald-500 p-6 flex flex-col md:flex-row justify-between items-center gap-4 shadow-xl">
         <div>
-            <h3 class="text-2xl font-black text-indigo-700">{{ $stockOpname->code }}</h3>
-            <p class="text-sm text-gray-500 mt-1">Tanggal Audit:
-                <b>{{ \Carbon\Carbon::parse($stockOpname->created_at)->format('d F Y, H:i') }}</b></p>
+            <div class="flex items-center gap-3">
+                <span
+                    class="bg-emerald-600 text-white text-[10px] font-black px-2 py-0.5 uppercase tracking-widest border border-emerald-400">Arsip
+                    Audit</span>
+                <h3 class="text-3xl font-black tracking-tighter uppercase">{{ $stockOpname->code }}</h3>
+            </div>
+            <p class="text-[11px] text-slate-400 font-bold uppercase mt-2 tracking-wider">
+                Tanggal Audit: {{ \Carbon\Carbon::parse($stockOpname->created_at)->format('d F Y, H:i') }} | Status:
+                Selesai
+            </p>
         </div>
         <div class="text-left md:text-right">
-            <span
-                class="bg-green-100 text-green-800 px-3 py-1.5 rounded-full text-sm font-bold uppercase tracking-wider border border-green-200">
-                Status: Selesai
-            </span>
-            <p class="text-xs text-gray-400 mt-2">Data stok telah diperbarui ke gudang.</p>
+            <button onclick="window.print()"
+                class="bg-white text-slate-900 font-black px-6 py-2 text-xs uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition-none border-2 border-slate-900 shadow-[4px_4px_0px_rgba(255,255,255,0.2)]">
+                🖨️ Cetak Laporan
+            </button>
         </div>
     </div>
 
-    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 border border-gray-100">
-        <div class="flex flex-col md:flex-row justify-between items-center mb-4 border-b pb-4 space-y-3 md:space-y-0">
-            <h4 class="text-lg font-bold text-gray-800">Rincian Hasil Audit Fisik</h4>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-1 bg-slate-300 border border-slate-300 shadow-md">
+        <div class="bg-white p-5 border-b-4 border-slate-900">
+            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Total Produk Di-Audit</p>
+            <h4 class="text-3xl font-black text-slate-900">{{ $items->total() }} <span
+                    class="text-sm font-bold text-slate-400 uppercase">Item</span></h4>
+        </div>
+        <div class="bg-white p-5 border-b-4 border-rose-600">
+            <p class="text-[10px] font-black text-rose-600 uppercase tracking-widest mb-1">Potensi Kerugian (Stok
+                Kurang)</p>
+            <h4 class="text-3xl font-black text-rose-600">
+                -{{ $items->getCollection()->where('jumlah_akhir', '<', 'jumlah_awal')->count() }}
+                <span class="text-sm font-bold uppercase">Produk</span>
+            </h4>
+        </div>
+        <div class="bg-white p-5 border-b-4 border-blue-600">
+            <p class="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">Stok Berlebih (Kelebihan
+                Fisik)</p>
+            <h4 class="text-3xl font-black text-blue-600">
+                +{{ $items->getCollection()->where('jumlah_akhir', '>', 'jumlah_awal')->count() }}
+                <span class="text-sm font-bold uppercase">Produk</span>
+            </h4>
+        </div>
+    </div>
+
+    <div class="bg-white border-2 border-slate-900 shadow-sm overflow-hidden">
+        <div
+            class="p-3 bg-slate-100 border-b-2 border-slate-900 flex flex-col md:flex-row justify-between items-center gap-4">
+            <h4 class="text-xs font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
+                <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                    </path>
+                </svg>
+                Rincian Perbandingan Stok Fisik vs Sistem
+            </h4>
 
             <div class="relative w-full md:w-1/3">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-                </div>
-                <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari nama barang..."
-                    class="w-full pl-10 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+                <input type="text" wire:model.live.debounce.300ms="search" placeholder="CARI NAMA BARANG..."
+                    class="w-full pl-4 pr-10 py-1.5 rounded-none border-2 border-slate-300 focus:border-indigo-600 focus:ring-0 text-[10px] font-black uppercase bg-white">
             </div>
         </div>
 
-        <div class="overflow-x-auto relative">
-            <div wire:loading.class="opacity-50" class="transition-opacity duration-200">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-gray-50 border-b border-gray-200">
-                            <th class="py-3 px-4 font-semibold text-sm text-gray-600">Nama Barang</th>
-                            <th class="py-3 px-4 font-semibold text-sm text-gray-600 text-center">Stok Sistem (Awal)
-                            </th>
-                            <th class="py-3 px-4 font-semibold text-sm text-gray-600 text-center">Stok Fisik (Akhir)
-                            </th>
-                            <th class="py-3 px-4 font-semibold text-sm text-gray-600 text-center">Selisih</th>
-                            <th class="py-3 px-4 font-semibold text-sm text-gray-600">Keterangan / Alasan</th>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse whitespace-nowrap">
+                <thead class="bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest">
+                    <tr>
+                        <th class="py-3 px-6 border-r border-slate-700">Identitas Barang</th>
+                        <th class="py-3 px-6 border-r border-slate-700 text-center">Stok Sistem</th>
+                        <th class="py-3 px-6 border-r border-slate-700 text-center">Stok Fisik</th>
+                        <th class="py-3 px-6 border-r border-slate-700 text-center">Selisih</th>
+                        <th class="py-3 px-4">Keterangan / Justifikasi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-300">
+                    @forelse($items as $item)
+                        @php $selisih = $item->jumlah_akhir - $item->jumlah_awal; @endphp
+                        <tr class="hover:bg-slate-50 transition-none">
+                            <td class="py-3 px-6 border-r border-slate-100">
+                                <div class="flex flex-col">
+                                    <span
+                                        class="font-black text-slate-900 text-xs uppercase leading-none">{{ $item->product->nama ?? 'PRODUK DIHAPUS' }}</span>
+                                    <span class="font-mono text-[9px] text-slate-500 uppercase mt-1">Barcode:
+                                        {{ $item->product->barcode ?? '-' }}</span>
+                                </div>
+                            </td>
+                            <td
+                                class="py-3 px-6 text-center border-r border-slate-100 font-bold text-slate-400 text-sm">
+                                {{ $item->jumlah_awal }}
+                            </td>
+                            <td
+                                class="py-3 px-6 text-center border-r border-slate-100 font-black text-slate-900 text-sm bg-slate-50/50">
+                                {{ $item->jumlah_akhir }}
+                            </td>
+                            <td class="py-3 px-6 text-center border-r border-slate-100 font-black text-sm uppercase">
+                                @if ($selisih < 0)
+                                    <span
+                                        class="bg-rose-100 text-rose-700 px-2 py-1 border border-rose-300">{{ $selisih }}</span>
+                                @elseif($selisih > 0)
+                                    <span
+                                        class="bg-blue-100 text-blue-700 px-2 py-1 border border-blue-300">+{{ $selisih }}</span>
+                                @else
+                                    <span class="text-slate-300 font-medium">Sesuai</span>
+                                @endif
+                            </td>
+                            <td class="py-3 px-4 text-[11px] font-bold text-slate-600 uppercase italic">
+                                {{ $item->keterangan ?? '-' }}
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($items as $item)
-                            @php $selisih = $item->jumlah_akhir - $item->jumlah_awal; @endphp
-                            <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
-                                <td class="py-3 px-4 font-medium text-gray-800">
-                                    {{ $item->product->nama ?? 'Barang Telah Dihapus' }}</td>
-                                <td class="py-3 px-4 text-center text-gray-500">{{ $item->jumlah_awal }}</td>
-                                <td class="py-3 px-4 text-center font-bold text-gray-800">{{ $item->jumlah_akhir }}</td>
-                                <td class="py-3 px-4 text-center font-bold">
-                                    @if ($selisih < 0)
-                                        <span class="text-red-600">{{ $selisih }}</span>
-                                    @elseif($selisih > 0)
-                                        <span class="text-blue-600">+{{ $selisih }}</span>
-                                    @else
-                                        <span class="text-gray-400">0</span>
-                                    @endif
-                                </td>
-                                <td class="py-3 px-4 text-sm text-gray-600 italic">{{ $item->keterangan ?? '-' }}</td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="py-8 text-center text-gray-400">Tidak ada data ditemukan.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                    @empty
+                        <tr>
+                            <td colspan="5"
+                                class="py-12 text-center text-slate-400 font-black text-xs uppercase tracking-widest">
+                                Data Audit Kosong</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
-
-        <div class="mt-4 pt-4">
+        <div class="p-3 bg-slate-50 border-t border-slate-300">
             {{ $items->links() }}
         </div>
     </div>

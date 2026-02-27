@@ -1,276 +1,155 @@
-<div x-data="{
-    showAdd: false,
-    showEdit: false,
-    editUrl: '',
-    form: { nama: '', barcode: '', harga_beli: '', harga_jual: '', jumlah: '', tags: [] }
-}">
+<div x-data="{ showAdd: false, showEdit: false, editUrl: '', form: { nama: '', barcode: '', harga_beli: '', harga_jual: '', jumlah: '', tags: [] } }" class="w-full">
 
     @if (session('success'))
-        <div class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
+        <div
+            class="mb-4 bg-emerald-600 text-white px-4 py-3 border-l-8 border-emerald-900 shadow-md uppercase font-black text-xs tracking-widest">
             {{ session('success') }}
         </div>
     @endif
-    @if ($errors->any())
-        <div class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-            <strong class="font-bold">Oops! Terdapat kesalahan:</strong>
-            <ul class="mt-2 list-disc list-inside text-sm">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
 
-    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+    <div class="bg-white border border-slate-300 shadow-sm">
+        <div
+            class="p-4 bg-slate-900 border-b-2 border-indigo-600 flex flex-col md:flex-row justify-between items-center gap-4">
+            <h3 class="text-sm font-black text-white uppercase tracking-widest">LOGISTIK INVENTARIS GUDANG</h3>
 
-        <div class="flex flex-col md:flex-row justify-between items-center mb-6 space-y-4 md:space-y-0">
-            <h3 class="text-lg font-bold text-gray-700 hidden md:block">Daftar Inventaris</h3>
-
-            <div class="flex w-full md:w-2/3 justify-end space-x-4">
+            <div class="flex w-full md:w-2/3 justify-end gap-2">
                 <div class="relative w-full md:w-1/2">
+                    <input type="text" wire:model.live.debounce.300ms="search" placeholder="CARI NAMA / BARCODE..."
+                        class="w-full pl-10 bg-slate-800 border-0 text-white text-xs font-bold uppercase focus:ring-2 focus:ring-indigo-500 rounded-none py-2">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="h-4 w-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                     </div>
-                    <input type="text" wire:model.live.debounce.300ms="search"
-                        placeholder="Cari nama atau barcode..."
-                        class="w-full pl-10 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
-                    <div wire:loading wire:target="search" class="absolute right-3 top-2.5">
-                        <svg class="animate-spin h-5 w-5 text-indigo-500" xmlns="http://www.w3.org/2000/svg"
-                            fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor"
-                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                            </path>
-                        </svg>
-                    </div>
                 </div>
-
                 <button @click="showAdd = true"
-                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded shadow transition whitespace-nowrap">
-                    + Tambah Barang
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-black py-2 px-4 text-xs uppercase tracking-widest border border-indigo-800 transition-none rounded-none shadow-md">
+                    + TAMBAH BARANG
                 </button>
             </div>
         </div>
 
-        <div class="overflow-x-auto relative">
-            <div wire:loading.class="opacity-50" class="transition-opacity duration-200">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-gray-50 border-b border-gray-200">
-                            <th class="py-3 px-4 font-semibold text-sm text-gray-600">Nama Barang</th>
-                            <th class="py-3 px-4 font-semibold text-sm text-gray-600">Barcode</th>
-                            <th class="py-3 px-4 font-semibold text-sm text-gray-600">Stok</th>
-                            <th class="py-3 px-4 font-semibold text-sm text-gray-600">Harga Jual</th>
-                            <th class="py-3 px-4 font-semibold text-sm text-gray-600 text-center">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($products as $product)
-                            <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
-                                <td class="py-3 px-4 font-medium">{{ $product->nama }}</td>
-                                <td class="py-3 px-4 text-gray-500 text-sm">{{ $product->barcode }}</td>
-                                <td
-                                    class="py-3 px-4 font-bold {{ $product->jumlah < 10 ? 'text-red-500' : 'text-green-600' }}">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse whitespace-nowrap">
+                <thead class="bg-slate-100 text-slate-600 border-b border-slate-300">
+                    <tr>
+                        <th class="py-3 px-4 font-black text-[10px] uppercase tracking-tighter">NAMA PRODUK</th>
+                        <th class="py-3 px-4 font-black text-[10px] uppercase tracking-tighter">BARCODE</th>
+                        <th class="py-3 px-4 font-black text-[10px] uppercase tracking-tighter text-center">STOK</th>
+                        <th class="py-3 px-4 font-black text-[10px] uppercase tracking-tighter text-right">HARGA JUAL
+                        </th>
+                        <th class="py-3 px-4 font-black text-[10px] uppercase tracking-tighter text-center">AKSI</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200">
+                    @forelse($products as $product)
+                        <tr class="hover:bg-slate-50 transition-none" wire:key="prod-{{ $product->id }}">
+                            <td class="py-2 px-4 font-bold text-slate-900 text-sm uppercase leading-tight">
+                                {{ $product->nama }}</td>
+                            <td class="py-2 px-4 font-mono text-xs text-slate-500">{{ $product->barcode }}</td>
+                            <td class="py-2 px-4 text-center">
+                                <span
+                                    class="px-2 py-0.5 font-black text-xs {{ $product->jumlah < 10 ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700' }}">
                                     {{ $product->jumlah }}
-                                </td>
-                                <td class="py-3 px-4 font-semibold text-indigo-600">Rp
-                                    {{ number_format($product->harga_jual, 0, ',', '.') }}</td>
+                                </span>
+                            </td>
+                            <td class="py-2 px-4 text-right font-black text-indigo-700 text-sm">
+                                Rp{{ number_format($product->harga_jual, 0, ',', '.') }}</td>
+                            <td class="py-2 px-4 text-center space-x-1">
+                                <button
+                                    @click="
+                                    form.nama = '{{ addslashes($product->nama) }}';
+                                    form.barcode = '{{ addslashes($product->barcode) }}';
+                                    form.harga_beli = '{{ $product->harga_beli }}';
+                                    form.harga_jual = '{{ $product->harga_jual }}';
+                                    form.jumlah = '{{ $product->jumlah }}';
+                                    form.tags = {{ $product->tags->pluck('id')->toJson() }};
+                                    editUrl = '{{ route('products.update', $product->id) }}';
+                                    showEdit = true;
+                                "
+                                    class="bg-slate-800 text-white text-[10px] font-black px-2 py-1 uppercase hover:bg-indigo-600 transition-none">EDIT</button>
 
-                                <td class="py-3 px-4 text-center space-x-2">
+                                <form action="{{ route('products.destroy', $product->id) }}" method="POST"
+                                    class="inline" onsubmit="return confirm('HAPUS PERMANEN?');">
+                                    @csrf @method('DELETE')
                                     <button
-                                        @click="
-                                        form.nama = '{{ addslashes($product->nama) }}';
-                                        form.barcode = '{{ addslashes($product->barcode) }}';
-                                        form.harga_beli = '{{ $product->harga_beli }}';
-                                        form.harga_jual = '{{ $product->harga_jual }}';
-                                        form.jumlah = '{{ $product->jumlah }}';
-                                        form.tags = {{ $product->tags->pluck('id')->toJson() }};
-                                        editUrl = '{{ route('products.update', $product->id) }}';
-                                        showEdit = true;
-                                    "
-                                        class="text-blue-600 hover:text-blue-800 font-medium px-2">
-                                        Edit
-                                    </button>
-
-                                    <form action="{{ route('products.destroy', $product->id) }}" method="POST"
-                                        class="inline-block"
-                                        onsubmit="return confirm('Apakah Anda yakin ingin menghapus {{ addslashes($product->nama) }}? Data ini tidak bisa dikembalikan.');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:text-red-800 font-medium px-2">
-                                            Hapus
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="py-8 text-center text-gray-400">
-                                    {{ $search ? 'Barang tidak ditemukan.' : 'Belum ada data barang di gudang.' }}
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                                        class="bg-rose-600 text-white text-[10px] font-black px-2 py-1 uppercase hover:bg-rose-800 transition-none">HAPUS</button>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="py-10 text-center text-slate-400 text-xs font-black uppercase">
+                                GUDANG KOSONG</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
-
-        <div class="mt-4 border-t border-gray-100 pt-4">
+        <div class="p-4 bg-slate-50 border-t border-slate-300">
             {{ $products->links() }}
         </div>
-
     </div>
 
-    <div x-show="showAdd" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div x-show="showAdd" @click="showAdd = false"
-                class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
-            <div x-show="showAdd"
-                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data">
+    <template x-if="showAdd || showEdit">
+        <div class="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm" @click="showAdd = false; showEdit = false">
+            </div>
+            <div
+                class="relative bg-white border-2 border-slate-900 shadow-[10px_10px_0px_rgba(0,0,0,1)] w-full max-w-lg rounded-none overflow-hidden">
+                <form :action="showAdd ? '{{ route('products.store') }}' : editUrl" method="POST"
+                    enctype="multipart/form-data">
                     @csrf
-                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Input Barang Baru</h3>
-                        <div class="space-y-4">
-                            <div><label class="block text-sm font-medium text-gray-700">Nama</label><input
-                                    type="text" name="nama" required
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></div>
+                    <template x-if="showEdit">@method('PUT')</template>
+
+                    <div class="p-5">
+                        <h3 class="text-sm font-black uppercase tracking-widest border-b-2 border-slate-900 pb-2 mb-4"
+                            x-text="showAdd ? 'INPUT BARANG BARU' : 'EDIT DATA BARANG'"></h3>
+                        <div class="grid grid-cols-1 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Foto Barang (Opsional)</label>
-                                <input type="file" name="gambar" accept="image/*"
-                                    class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                                <label class="block text-[10px] font-black text-slate-500 uppercase">Nama Produk</label>
+                                <input type="text" name="nama" x-model="form.nama" required
+                                    class="w-full border-2 border-slate-800 rounded-none text-sm font-bold uppercase focus:ring-0 focus:border-indigo-600">
                             </div>
-                            <div><label class="block text-sm font-medium text-gray-700">Barcode</label><input
-                                    type="text" name="barcode" required
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></div>
                             <div class="grid grid-cols-2 gap-4">
-                                <div><label class="block text-sm font-medium text-gray-700">Harga Beli</label><input
-                                        type="number" name="harga_beli" required
-                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></div>
-                                <div><label class="block text-sm font-medium text-gray-700">Harga Jual</label><input
-                                        type="number" name="harga_jual" required
-                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></div>
-                            </div>
-                            <div><label class="block text-sm font-medium text-gray-700">Jumlah Awal</label><input
-                                    type="number" name="jumlah" required
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></div>
-                            <div x-data="{ searchTag: '' }">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Kategori Tag
-                                    (Opsional)</label>
-
-                                <div class="relative mb-2">
-                                    <div class="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
-                                        <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                        </svg>
-                                    </div>
-                                    <input type="text" x-model="searchTag" placeholder="Cari kategori..."
-                                        class="w-full pl-8 py-1.5 text-sm border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                                <div>
+                                    <label class="block text-[10px] font-black text-slate-500 uppercase">Barcode</label>
+                                    <input type="text" name="barcode" x-model="form.barcode" required
+                                        class="w-full border-2 border-slate-800 rounded-none text-sm font-bold uppercase focus:ring-0">
                                 </div>
-
-                                <div
-                                    class="flex flex-col gap-1 max-h-40 overflow-y-auto p-2 border border-gray-200 rounded-md bg-gray-50 shadow-inner">
-                                    @forelse ($tags as $tag)
-                                        <label
-                                            class="inline-flex items-center cursor-pointer hover:bg-indigo-100 px-2 py-1.5 rounded transition-colors"
-                                            x-show="searchTag === '' || '{{ strtolower(addslashes($tag->nama)) }}'.includes(searchTag.toLowerCase())">
-
-                                            <input type="checkbox" name="tags[]" value="{{ $tag->id }}"
-                                                class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 w-4 h-4">
-                                            <span
-                                                class="ml-2 text-sm text-gray-700 font-medium">{{ $tag->nama }}</span>
-                                        </label>
-                                    @empty
-                                        <span class="text-sm text-gray-400 italic px-2 py-1">Belum ada kategori yang
-                                            dibuat.</span>
-                                    @endforelse
-
-                                    <div x-show="searchTag !== ''" class="text-xs text-gray-500 text-center py-2"
-                                        style="display: none;">
-                                        Tidak menemukan tag? <br> Buat dulu di menu Kategori.
-                                    </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-slate-500 uppercase">Stok
+                                        Awal</label>
+                                    <input type="number" name="jumlah" x-model="form.jumlah" required
+                                        class="w-full border-2 border-slate-800 rounded-none text-sm font-bold uppercase focus:ring-0">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[10px] font-black text-slate-500 uppercase">Harga
+                                        Beli</label>
+                                    <input type="number" name="harga_beli" x-model="form.harga_beli" required
+                                        class="w-full border-2 border-slate-800 rounded-none text-sm font-bold uppercase focus:ring-0">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-black text-slate-500 uppercase">Harga
+                                        Jual</label>
+                                    <input type="number" name="harga_jual" x-model="form.harga_jual" required
+                                        class="w-full border-2 border-slate-800 rounded-none text-sm font-bold uppercase focus:ring-0">
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="bg-gray-50 px-4 py-3 sm:px-6 flex justify-end space-x-2">
-                        <button type="button" @click="showAdd = false"
-                            class="bg-white py-2 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Batal</button>
+                    <div class="bg-slate-100 p-4 border-t-2 border-slate-900 flex justify-end gap-2">
+                        <button type="button" @click="showAdd = false; showEdit = false"
+                            class="bg-white border-2 border-slate-900 px-4 py-2 text-xs font-black uppercase hover:bg-slate-200 transition-none rounded-none">BATAL</button>
                         <button type="submit"
-                            class="bg-indigo-600 py-2 px-4 border border-transparent rounded-md text-white hover:bg-indigo-700">Simpan</button>
+                            class="bg-indigo-600 text-white border-2 border-slate-900 px-6 py-2 text-xs font-black uppercase hover:bg-indigo-700 transition-none rounded-none shadow-[4px_4px_0px_rgba(0,0,0,1)]">SIMPAN
+                            DATA</button>
                     </div>
                 </form>
             </div>
         </div>
-    </div>
-
-    <div x-show="showEdit" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div x-show="showEdit" @click="showEdit = false"
-                class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
-            <div x-show="showEdit"
-                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <form x-bind:action="editUrl" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    @method('PUT')
-                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Edit Data Barang</h3>
-                        <div class="space-y-4">
-                            <div><label class="block text-sm font-medium text-gray-700">Nama</label><input
-                                    type="text" name="nama" x-model="form.nama" required
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Foto Barang (Opsional)</label>
-                                <input type="file" name="gambar" accept="image/*"
-                                    class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
-                            </div>
-                            <div><label class="block text-sm font-medium text-gray-700">Barcode</label><input
-                                    type="text" name="barcode" x-model="form.barcode" required
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></div>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div><label class="block text-sm font-medium text-gray-700">Harga Beli</label><input
-                                        type="number" name="harga_beli" x-model="form.harga_beli" required
-                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></div>
-                                <div><label class="block text-sm font-medium text-gray-700">Harga Jual</label><input
-                                        type="number" name="harga_jual" x-model="form.harga_jual" required
-                                        class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></div>
-                            </div>
-                            <div><label class="block text-sm font-medium text-gray-700">Jumlah Stok</label><input
-                                    type="number" name="jumlah" x-model="form.jumlah" required
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Kategori Tag</label>
-                                <div class="flex flex-wrap gap-2">
-                                    @foreach ($tags as $tag)
-                                        <label
-                                            class="inline-flex items-center bg-white border border-gray-300 px-3 py-1 rounded-full cursor-pointer hover:bg-indigo-50 transition">
-                                            <input type="checkbox" name="tags[]" :value="{{ $tag->id }}"
-                                                x-model="form.tags"
-                                                class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                                            <span class="ml-2 text-sm text-gray-700">{{ $tag->nama }}</span>
-                                        </label>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-gray-50 px-4 py-3 sm:px-6 flex justify-end space-x-2">
-                        <button type="button" @click="showEdit = false"
-                            class="bg-white py-2 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Batal</button>
-                        <button type="submit"
-                            class="bg-blue-600 py-2 px-4 border border-transparent rounded-md text-white hover:bg-blue-700">Update
-                            Data</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+    </template>
 </div>

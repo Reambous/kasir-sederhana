@@ -66,7 +66,7 @@ class StockOpnameManager extends Component
         if ($this->searchHistory) {
             $historyQuery->where('code', 'like', '%' . $this->searchHistory . '%');
         }
-        $historySO = $historyQuery->paginate(5, ['*'], 'historyPage');
+        $historySO = $historyQuery->paginate(9, ['*'], 'historyPage');
 
         return view('livewire.stock-opname-manager', compact('activeSO', 'activeProducts', 'historySO'));
     }
