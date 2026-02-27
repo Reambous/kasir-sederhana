@@ -6,6 +6,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\StockOpnameController;
 
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -35,6 +36,12 @@ Route::view('profile', 'profile')
 | POS System Routes (Dilindungi oleh Auth & Role Masing-masing)
 |--------------------------------------------------------------------------
 */
+// --- KHUSUS ADMIN (SUPER USER) ---
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    // Rute Kelola Pengguna menggunakan Livewire
+    Route::get('/users', \App\Livewire\UserManagement::class)->name('users.index');
+});
+
 
 // --- KHUSUS KASIR ---
 Route::middleware(['auth', 'role:kasir'])->group(function () {

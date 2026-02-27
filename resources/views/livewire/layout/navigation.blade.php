@@ -15,68 +15,73 @@ new class extends Component {
     }
 }; ?>
 
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
-    <!-- Primary Navigation Menu -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<nav x-data="{ open: false }" class="bg-slate-900 border-b-4 border-indigo-600">
+    <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
-            <div class="flex">
-                <!-- Logo -->
+            <div class="flex items-center">
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}" wire:navigate>
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                    <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-indigo-600 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                        <span class="text-white font-black text-xl tracking-wider uppercase hidden sm:block">POS<span
+                                class="text-indigo-500">SYS</span></span>
                     </a>
                 </div>
 
-                <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
-                        {{ __('Dashboard') }}
+                <div class="hidden space-x-1 sm:-my-px sm:ml-8 sm:flex">
+                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')"
+                        class="text-slate-300 hover:text-white focus:text-white uppercase text-xs font-bold tracking-wider px-3 border-transparent hover:bg-slate-800 transition-colors">
+                        Dashboard
                     </x-nav-link>
 
-                    @if (auth()->user()->role === 'kasir')
-                        <x-nav-link :href="route('pos')" :active="request()->routeIs('pos')" wire:navigate>
-                            {{ __('Mesin Kasir') }}
+                    @if (auth()->user()->role === 'admin' || auth()->user()->role === 'gudang')
+                        <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')"
+                            class="text-slate-300 hover:text-white focus:text-white uppercase text-xs font-bold tracking-wider px-3 border-transparent hover:bg-slate-800 transition-colors">
+                            Inventaris
                         </x-nav-link>
-                        <x-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')" wire:navigate>
-                            {{ __('Riwayat Transaksi') }}
+                        <x-nav-link :href="route('tags.index')" :active="request()->routeIs('tags.*')"
+                            class="text-slate-300 hover:text-white focus:text-white uppercase text-xs font-bold tracking-wider px-3 border-transparent hover:bg-slate-800 transition-colors">
+                            Kategori
+                        </x-nav-link>
+                        <x-nav-link :href="route('stock-opnames.index')" :active="request()->routeIs('stock-opnames.*')"
+                            class="text-slate-300 hover:text-white focus:text-white uppercase text-xs font-bold tracking-wider px-3 border-transparent hover:bg-slate-800 transition-colors">
+                            Opname
                         </x-nav-link>
                     @endif
 
-                    @if (auth()->user()->role === 'gudang')
-                        <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')" wire:navigate>
-                            {{ __('Gudang') }}
+                    @if (auth()->user()->role === 'admin' || auth()->user()->role === 'kasir')
+                        <x-nav-link :href="route('pos')" :active="request()->routeIs('pos')"
+                            class="text-emerald-400 hover:text-emerald-300 focus:text-emerald-300 uppercase text-xs font-black tracking-wider px-3 border-transparent hover:bg-slate-800 transition-colors">
+                            Mesin POS
                         </x-nav-link>
-                        <x-nav-link :href="route('stock-opnames.index')" :active="request()->routeIs('stock-opnames.*')" wire:navigate>
-                            {{ __('Stock Opname') }}
+                        <x-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')"
+                            class="text-slate-300 hover:text-white focus:text-white uppercase text-xs font-bold tracking-wider px-3 border-transparent hover:bg-slate-800 transition-colors">
+                            Transaksi
                         </x-nav-link>
-                        <x-nav-link :href="route('tags.index')" :active="request()->routeIs('tags.*')" wire:navigate>
-                            {{ __('Kategori Tag') }}
+                    @endif
+
+                    @if (auth()->user()->role === 'admin')
+                        <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')"
+                            class="text-indigo-400 hover:text-indigo-300 focus:text-indigo-300 uppercase text-xs font-black tracking-wider px-3 border-transparent hover:bg-slate-800 transition-colors">
+                            Pengguna
                         </x-nav-link>
                     @endif
                 </div>
             </div>
 
-            <!-- Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
+            <div class="hidden sm:flex sm:items-center sm:ml-6">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button
-                            class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+                            class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-bold rounded-none text-slate-300 bg-slate-900 hover:text-white focus:outline-none transition ease-in-out duration-150 uppercase tracking-widest">
+                            <div x-data="{{ json_encode(['name' => auth()->user()->nama]) }}" x-text="name"
+                                x-on:profile-updated.window="name = $event.detail.name"></div>
 
-                            @if (auth()->user()->gambar)
-                                <img class="h-8 w-8 object-cover rounded-full mr-2"
-                                    src="{{ asset('storage/' . auth()->user()->gambar) }}" alt="Avatar">
-                            @else
-                                <div
-                                    class="h-8 w-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-bold mr-2 text-xs">
-                                    {{ substr(auth()->user()->nama, 0, 1) }}
-                                </div>
-                            @endif
-
-                            <div x-data="{{ json_encode(['nama' => auth()->user()->nama]) }}" x-text="nama"
-                                x-on:profile-updated.window="nama = $event.detail.nama"></div>
-
-                            <div class="ms-1">
+                            <div class="ml-1">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
                                     viewBox="0 0 20 20">
                                     <path fill-rule="evenodd"
@@ -88,24 +93,26 @@ new class extends Component {
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile')" wire:navigate>
-                            {{ __('Profile') }}
-                        </x-dropdown-link>
-
-                        <!-- Authentication -->
-                        <button wire:click="logout" class="w-full text-start">
-                            <x-dropdown-link>
-                                {{ __('Log Out') }}
+                        <div class="bg-white border-2 border-slate-900 shadow-xl rounded-none">
+                            <x-dropdown-link :href="route('profile')" wire:navigate
+                                class="hover:bg-slate-100 font-bold text-slate-800 uppercase text-xs tracking-wider">
+                                {{ __('Profil Akun') }}
                             </x-dropdown-link>
-                        </button>
+
+                            <button wire:click="logout" class="w-full text-left">
+                                <x-dropdown-link
+                                    class="hover:bg-rose-50 text-rose-600 font-bold uppercase text-xs tracking-wider border-t border-slate-100">
+                                    {{ __('Otorisasi Keluar') }}
+                                </x-dropdown-link>
+                            </button>
+                        </div>
                     </x-slot>
                 </x-dropdown>
             </div>
 
-            <!-- Hamburger -->
-            <div class="-me-2 flex items-center sm:hidden">
+            <div class="-mr-2 flex items-center sm:hidden">
                 <button @click="open = ! open"
-                    class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
+                    class="inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-800 focus:outline-none focus:bg-slate-800 focus:text-white transition duration-150 ease-in-out">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{ 'hidden': open, 'inline-flex': !open }" class="inline-flex"
                             stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -118,51 +125,30 @@ new class extends Component {
         </div>
     </div>
 
-    <!-- Responsive Navigation Menu -->
-    <div :class="{ 'block': open, 'hidden': !open }" class="hidden sm:hidden">
+    <div :class="{ 'block': open, 'hidden': !open }" class="hidden sm:hidden bg-slate-800 border-t border-slate-700">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
-                {{ __('Dashboard') }}
+            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')"
+                class="text-white font-bold uppercase tracking-wider text-sm">
+                Dashboard
             </x-responsive-nav-link>
-            @if (auth()->user()->role === 'kasir')
-                <x-responsive-nav-link :href="route('pos')" :active="request()->routeIs('pos')" wire:navigate>
-                    {{ __('Mesin Kasir') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')" wire:navigate>
-                    {{ __('Riwayat Transaksi') }}
-                </x-responsive-nav-link>
-            @endif
-
-            @if (auth()->user()->role === 'gudang')
-                <x-responsive-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')" wire:navigate>
-                    {{ __('Gudang') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('stock-opnames.index')" :active="request()->routeIs('stock-opnames.*')" wire:navigate>
-                    {{ __('Stock Opname') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('tags.index')" :active="request()->routeIs('tags.*')" wire:navigate>
-                    {{ __('Kategori Tag') }}
-                </x-responsive-nav-link>
-            @endif
         </div>
 
-        <!-- Responsive Settings Options -->
-        <div class="pt-4 pb-1 border-t border-gray-200">
+        <div class="pt-4 pb-1 border-t border-slate-700">
             <div class="px-4">
-                <div class="font-medium text-base text-gray-800" x-data="{{ json_encode(['nama' => auth()->user()->nama]) }}" x-text="nama"
-                    x-on:profile-updated.window="nama = $event.detail.nama"></div>
-                <div class="font-medium text-sm text-gray-500">{{ auth()->user()->email }}</div>
+                <div class="font-bold text-base text-white" x-data="{{ json_encode(['name' => auth()->user()->nama]) }}" x-text="name"
+                    x-on:profile-updated.window="name = $event.detail.name"></div>
+                <div class="font-medium text-sm text-slate-400">{{ auth()->user()->email }}</div>
             </div>
 
             <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile')" wire:navigate>
-                    {{ __('Profile') }}
+                <x-responsive-nav-link :href="route('profile')" wire:navigate
+                    class="text-slate-300 font-bold uppercase text-xs">
+                    Profil Akun
                 </x-responsive-nav-link>
 
-                <!-- Authentication -->
-                <button wire:click="logout" class="w-full text-start">
-                    <x-responsive-nav-link>
-                        {{ __('Log Out') }}
+                <button wire:click="logout" class="w-full text-left">
+                    <x-responsive-nav-link class="text-rose-500 font-bold uppercase text-xs">
+                        Otorisasi Keluar
                     </x-responsive-nav-link>
                 </button>
             </div>

@@ -1,229 +1,220 @@
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+<div class="w-full flex flex-col lg:flex-row gap-1 bg-slate-200">
 
-    <div class="md:col-span-2 bg-white rounded-lg shadow-sm p-6 border border-gray-100">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-bold text-gray-800">Daftar Produk</h3>
-            <input type="text" wire:model.live="search" placeholder="Cari nama atau barcode..."
-                class="w-1/2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+    <div class="w-full lg:w-[75%] bg-white border border-slate-400 flex flex-col h-[calc(100vh-6rem)]">
+
+        <div
+            class="p-2 bg-slate-900 flex flex-col sm:flex-row justify-between items-center gap-2 border-b-2 border-indigo-600">
+            <h3 class="text-sm font-black text-white uppercase tracking-tighter">KATALOG PRODUK</h3>
+            <div class="w-full sm:w-1/2 relative">
+                <input type="text" wire:model.live="search" placeholder="SCAN BARCODE / KETIK NAMA..."
+                    class="w-full pl-3 pr-8 py-1 rounded-none border-0 focus:ring-2 focus:ring-indigo-500 text-xs font-bold uppercase text-slate-900 bg-slate-100 font-mono">
+            </div>
         </div>
 
-        <div x-data="{ showTags: false }" class="mb-4 pb-3 border-b border-gray-100">
-            <div class="flex items-center space-x-3">
+        <div x-data="{ showTags: false }" class="px-2 py-1.5 border-b border-slate-300 bg-slate-100 shadow-inner">
+            <div class="flex items-center gap-2">
                 <button @click="showTags = !showTags" type="button"
-                    class="flex items-center text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg transition border border-gray-200 focus:outline-none shadow-sm">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z">
-                        </path>
-                    </svg>
-                    Filter Kategori
-                    <svg :class="{ 'rotate-180': showTags }" class="w-4 h-4 ml-2 transition-transform duration-200"
-                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
+                    class="text-[10px] font-black text-white bg-slate-700 hover:bg-slate-800 px-3 py-1 uppercase tracking-widest border border-slate-900 rounded-none transition-none shadow-sm">
+                    [+] PILIH KATEGORI
                 </button>
 
                 @if (!empty($selectedTags))
-                    <span class="text-xs font-bold text-indigo-600 bg-indigo-100 px-2 py-1 rounded-full">
-                        {{ count($selectedTags) }} Aktif
+                    <span
+                        class="text-[9px] font-black text-white bg-indigo-600 px-2 py-0.5 uppercase rounded-none border border-indigo-800">
+                        {{ count($selectedTags) }} FILTER AKTIF
                     </span>
                     <button wire:click="$set('selectedTags', [])"
-                        class="text-xs text-red-500 hover:text-red-700 underline">
-                        Reset
-                    </button>
+                        class="text-[9px] text-rose-600 font-black uppercase hover:underline">BERSIHKAN</button>
                 @endif
             </div>
 
-            <div x-show="showTags" x-transition style="display: none;"
-                class="mt-3 p-4 bg-gray-50 border border-gray-200 rounded-lg flex flex-wrap gap-2 shadow-inner">
+            <div x-show="showTags" x-transition
+                class="mt-2 p-2 bg-white border border-slate-400 flex flex-wrap gap-1 shadow-md">
                 @foreach ($allTags as $tag)
                     <label
-                        class="inline-flex items-center bg-white border border-gray-200 px-3 py-1.5 rounded-full cursor-pointer hover:bg-indigo-50 hover:border-indigo-300 transition text-sm shadow-sm">
+                        class="inline-flex items-center bg-slate-50 border border-slate-300 px-2 py-1 cursor-pointer hover:bg-indigo-600 hover:text-white transition-none rounded-none group">
                         <input type="checkbox" wire:model.live="selectedTags" value="{{ $tag->id }}"
-                            class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                        <span class="ml-2 text-gray-700 font-medium">{{ $tag->nama }}</span>
+                            class="rounded-none border-slate-500 text-indigo-600 focus:ring-0 h-3 w-3">
+                        <span
+                            class="ml-1 text-[10px] font-black uppercase group-hover:text-white">{{ $tag->nama }}</span>
                     </label>
                 @endforeach
-
-                @if ($allTags->isEmpty())
-                    <span class="text-sm text-gray-400">Belum ada kategori yang dibuat di menu Gudang.</span>
-                @endif
             </div>
         </div>
 
-        <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-            @forelse($products as $product)
-                <button wire:click="addToCart('{{ $product->id }}')"
-                    class="flex flex-col text-left bg-white p-3 rounded-xl border border-gray-200 hover:border-indigo-400 hover:shadow-md transition-all focus:outline-none group overflow-hidden">
-                    <div
-                        class="w-full h-32 bg-gray-50 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
-                        @if ($product->gambar)
-                            <img src="{{ asset('storage/' . $product->gambar) }}" alt="{{ $product->nama }}"
-                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
-                        @else
-                            <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                            </svg>
-                        @endif
-                    </div>
-                    <span
-                        class="font-bold text-gray-800 text-sm leading-tight line-clamp-2 w-full">{{ $product->nama }}</span>
-                    <span class="text-xs text-gray-500 mt-1">Stok: {{ $product->jumlah }}</span>
-                    <span class="font-bold text-indigo-600 mt-auto pt-2">Rp
-                        {{ number_format($product->harga_jual, 0, ',', '.') }}</span>
-                </button>
-            @empty
-                <div class="col-span-full text-center py-10 text-gray-500">
-                    Produk tidak ditemukan. Coba hapus filter tag atau pencarian.
-                </div>
-            @endforelse
-        </div>
+        <div class="flex-1 overflow-y-auto p-2 bg-slate-200/50">
+            <div class="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
+                @forelse($products as $product)
+                    <button wire:click="addToCart('{{ $product->id }}')"
+                        class="flex flex-col text-left bg-white border-2 border-slate-300 hover:border-indigo-600 transition-all focus:outline-none rounded-none h-40 relative shadow-sm group">
 
-        <div class="pt-4 border-t border-gray-100">
+                        <div
+                            class="w-full h-20 bg-slate-100 flex items-center justify-center overflow-hidden border-b border-slate-200">
+                            @if ($product->gambar)
+                                <img src="{{ asset('storage/' . $product->gambar) }}" alt="{{ $product->nama }}"
+                                    class="w-full h-full object-cover">
+                            @else
+                                <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path
+                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                    </path>
+                                </svg>
+                            @endif
+                            <div
+                                class="absolute top-0 right-0 bg-slate-900 text-white text-[9px] font-black px-1.5 py-0.5 border-l border-b border-slate-700">
+                                {{ $product->jumlah }}
+                            </div>
+                        </div>
+
+                        <div class="p-2 flex flex-col flex-1 w-full justify-between">
+                            <span
+                                class="font-black text-slate-900 text-[14px] leading-[1.1] line-clamp-2 uppercase tracking-tight group-hover:text-indigo-700">
+                                {{ $product->nama }}
+                            </span>
+                            <span
+                                class="font-black text-indigo-700 text-[11px] bg-indigo-50 px-1 py-0.5 w-fit border border-indigo-100 mt-1">
+                                Rp{{ number_format($product->harga_jual, 0, ',', '.') }}
+                            </span>
+                        </div>
+                    </button>
+                @empty
+                    <div class="col-span-full text-center py-10 text-slate-500 text-xs font-black uppercase">BARANG
+                        TIDAK ADA</div>
+                @endforelse
+            </div>
+        </div>
+        <div class="p-1 bg-white border-t border-slate-300">
             {{ $products->links() }}
         </div>
     </div>
 
     <div
-        class="bg-white rounded-lg shadow-sm p-6 border border-gray-100 flex flex-col sticky top-6 h-[calc(100vh-3rem)]">
-        <h3 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Detail Pesanan</h3>
+        class="w-full lg:w-[25%] bg-white border border-slate-400 flex flex-col h-[calc(100vh-6rem)] shadow-lg rounded-none">
 
-        @if (session()->has('success'))
-            <div class="p-4 mb-4 text-sm text-green-800 bg-green-100 rounded-lg border border-green-300">
-                <p class="font-bold mb-2">{{ session('success') }}</p>
-                @if ($lastOrderId)
-                    <a href="{{ route('orders.export', $lastOrderId) }}" target="_blank"
-                        class="inline-block bg-white text-green-700 font-bold py-1 px-4 border border-green-500 rounded hover:bg-green-50 transition">
-                        🖨️ Cetak Struk Terakhir
-                    </a>
-                    <button wire:click="$set('lastOrderId', null)"
-                        class="ml-2 inline-block text-gray-500 underline text-xs">Tutup</button>
-                @endif
-            </div>
-        @endif
-        @if (session()->has('error'))
-            <div class="p-3 mb-4 text-sm text-red-800 bg-red-100 rounded-lg border border-red-300">
-                {{ session('error') }}
-            </div>
-        @endif
-
-        <div class="flex-1 overflow-y-auto mb-4 pr-2 space-y-3">
-            @forelse($cart as $id => $item)
-                <div class="flex justify-between items-center bg-gray-50 p-3 rounded border border-gray-200">
-                    <div class="flex-1">
-                        <div class="font-semibold text-sm">{{ $item['nama'] }}</div>
-                        <div class="text-xs text-gray-500">Rp {{ number_format($item['harga_jual'], 0, ',', '.') }}
-                        </div>
+        <div class="p-2 bg-slate-900 text-white border-b-2 border-indigo-600">
+            <h3 class="text-xs font-black uppercase tracking-widest">STRUK ANTRIAN</h3>
+        </div>
+        <div class="px-2 pt-2">
+            {{-- NOTIFIKASI SUKSES --}}
+            @if (session()->has('success'))
+                <div
+                    class="p-2 bg-emerald-600 text-white border-2 border-emerald-900 mb-2 flex justify-between items-center shadow-[4px_4px_0px_rgba(0,0,0,1)]">
+                    <div class="flex flex-col">
+                        <span class="text-[11px] font-black uppercase tracking-widest">✅ BERHASIL</span>
+                        <span class="text-[9px] font-bold uppercase">{{ session('success') }}</span>
                     </div>
+                    @if (isset($lastOrderId))
+                        <a href="{{ route('orders.export', $lastOrderId) }}" target="_blank"
+                            class="bg-white text-emerald-900 px-3 py-1 font-black text-[10px] hover:bg-slate-100 border-2 border-emerald-900 transition-none">
+                            PRINT STRUK
+                        </a>
+                    @endif
+                </div>
+            @endif
 
-                    <div class="flex items-center space-x-1">
-                        <button wire:click="decreaseQty('{{ $id }}')"
-                            class="bg-gray-200 text-gray-700 px-2 py-1 rounded hover:bg-gray-300 transition">-</button>
-
-                        <input type="number" wire:key="qty-{{ $id }}-{{ $item['jumlah'] }}"
-                            wire:change="updateQty('{{ $id }}', $event.target.value)"
-                            value="{{ $item['jumlah'] }}" min="1"
-                            class="w-14 text-center text-sm border-gray-300 rounded py-1 focus:ring-indigo-500 focus:border-indigo-500">
-                        <button wire:click="addToCart('{{ $id }}')"
-                            class="bg-gray-200 text-gray-700 px-2 py-1 rounded hover:bg-gray-300 transition">+</button>
-
-                        <button wire:click="removeItem('{{ $id }}')"
-                            class="ml-2 bg-red-100 text-red-600 p-1.5 rounded hover:bg-red-200 transition"
-                            title="Hapus Barang">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                </path>
-                            </svg>
-                        </button>
+            {{-- NOTIFIKASI ERROR / BATAL / STOK KURANG --}}
+            @if (session()->has('error'))
+                <div
+                    class="p-2 bg-rose-600 text-white border-2 border-rose-900 mb-2 shadow-[4px_4px_0px_rgba(0,0,0,1)] animate-pulse">
+                    <div class="flex flex-col">
+                        <span class="text-[11px] font-black uppercase tracking-widest">⚠️ PERINGATAN!</span>
+                        <span class="text-[10px] font-bold uppercase">{{ session('error') }}</span>
                     </div>
                 </div>
-            @empty
-                <div class="text-center text-gray-400 py-10 text-sm">Keranjang masih kosong</div>
-            @endforelse
+            @endif
+        </div>
+        <div class="flex-1 overflow-y-auto p-1 bg-white border-b border-slate-300 font-mono">
+            <table class="w-full text-left border-collapse">
+                <tbody class="divide-y divide-slate-200">
+                    @forelse($cart as $id => $item)
+                        <tr class="hover:bg-slate-50 border-b border-dashed border-slate-200">
+                            <td class="py-2 pr-1 w-full">
+                                <div class="font-black text-slate-900 text-[14px] uppercase leading-none">
+                                    {{ $item['nama'] }}</div>
+                                <div class="text-[11px] text-slate-500 font-bold mt-1">@
+                                    Rp{{ number_format($item['harga_jual'], 0, ',', '.') }}</div>
+                            </td>
+                            <td class="py-2 whitespace-nowrap">
+                                <div
+                                    class="flex items-center border-1 border-slate-900 bg-white shadow-[1px_1px_1px_1px_rgba(1,1,1,1)]">
+                                    <button wire:click="decreaseQty('{{ $id }}')"
+                                        class="w-5 h-6 flex items-center justify-center bg-slate-100 text-slate-900 font-black text-[12px] hover:bg-slate-200 border-r border-slate-900">-</button>
+
+                                    <input type="number"
+                                        wire:key="qty-input-{{ $id }}-{{ $item['jumlah'] }}"
+                                        wire:change="updateQty('{{ $id }}', $event.target.value)"
+                                        value="{{ $item['jumlah'] }}" min="1"
+                                        class="w-8 h-6 text-center text-[12px] font-black border-0 p-0 focus:ring-0 bg-white text-slate-900">
+
+                                    <button wire:click="addToCart('{{ $id }}')"
+                                        class="w-5 h-6 flex items-center justify-center bg-slate-100 text-slate-900 font-black text-[12px] hover:bg-slate-200 border-l border-slate-900">+</button>
+                                </div>
+                            </td>
+                            <td class="py-2 pl-1 text-right">
+                                <button wire:click="removeItem('{{ $id }}')"
+                                    class="text-rose-600 font-black text-sm hover:bg-rose-50 px-1">&times;</button>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3" class="text-center text-slate-400 py-10 text-[9px] font-black uppercase">
+                                BELUM ADA ITEM</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
 
-        <div class="border-t pt-4 space-y-3">
-            <div>
-                <label class="block text-xs text-gray-500 mb-1">Nama Pembeli (Opsional)</label>
+        <div class="p-2 bg-slate-50 space-y-2 border-t border-slate-300">
+            <div class="space-y-1">
                 <input type="text" wire:model="nama_buyer"
-                    class="w-full text-sm rounded border-gray-300 py-1.5 focus:ring-indigo-500 focus:border-indigo-500">
-            </div>
+                    class="w-full text-[10px] font-bold uppercase rounded-none border border-slate-400 py-1 px-2 focus:ring-0 focus:border-indigo-600 placeholder-slate-400"
+                    placeholder="NAMA PELANGGAN">
 
-            <div class="flex space-x-2">
-                <div class="w-1/2">
-                    <label class="block text-xs text-gray-500 mb-1">Metode</label>
+                <div class="flex gap-1">
                     <select wire:model.live="metode_pembayaran"
-                        class="w-full text-sm rounded border-gray-300 py-1.5 focus:ring-indigo-500 focus:border-indigo-500">
-                        <option value="cash">Cash</option>
-                        <option value="non_cash">Non Cash</option>
+                        class="w-1/2 text-[9px] font-black uppercase rounded-none border border-slate-400 py-1 focus:ring-0">
+                        <option value="cash">TUNAI</option>
+                        <option value="non_cash">TRANSFER</option>
                     </select>
-                </div>
-                <div class="w-1/2">
-                    <label class="block text-xs text-gray-500 mb-1">Potongan (Rp)</label>
                     <input type="number" wire:model.live="potongan"
-                        class="w-full text-sm rounded border-gray-300 py-1.5 focus:ring-indigo-500 focus:border-indigo-500">
+                        class="w-1/2 text-[9px] font-bold uppercase rounded-none border border-slate-400 py-1 px-2 focus:ring-0 placeholder-slate-400"
+                        placeholder="DISKON">
                 </div>
             </div>
 
-            <div class="flex justify-between items-center text-lg font-bold text-gray-800 pt-2 border-t">
-                <span>Total Bayar:</span>
-                <span>Rp {{ number_format($this->total, 0, ',', '.') }}</span>
+            <div class="flex justify-between items-baseline pt-1 border-t border-slate-300">
+                <span class="text-[10px] font-black text-slate-500 uppercase">TOTAL</span>
+                <span
+                    class="text-2xl font-black text-indigo-700 tracking-tighter leading-none">Rp{{ number_format($this->total, 0, ',', '.') }}</span>
             </div>
 
             <div x-data="{
                 rawUang: $wire.entangle('uang_diterima').live,
-                get formattedUang() {
-                    return this.rawUang ? new Intl.NumberFormat('id-ID').format(this.rawUang) : '';
-                },
-                updateUang(event) {
-                    // Hapus semua karakter selain angka
-                    let val = event.target.value.replace(/\D/g, '');
-                    // Simpan angka murninya ke Livewire
-                    this.rawUang = val ? parseInt(val) : 0;
-                    // Format ulang tampilan dengan titik
-                    event.target.value = this.rawUang ? new Intl.NumberFormat('id-ID').format(this.rawUang) : '';
+                get formattedUang() { return this.rawUang ? new Intl.NumberFormat('id-ID').format(this.rawUang) : ''; },
+                updateUang(e) {
+                    let v = e.target.value.replace(/\D/g, '');
+                    this.rawUang = v ? parseInt(v) : 0;
+                    e.target.value = this.rawUang ? new Intl.NumberFormat('id-ID').format(this.rawUang) : '';
                 }
             }">
-                <label class="block text-xs text-gray-500 mb-1">Uang Diterima (Rp)</label>
-                <input type="text" :value="formattedUang" @input="updateUang"
-                    @if ($metode_pembayaran === 'non_cash') readonly @endif placeholder="Contoh: 100.000"
-                    class="w-full text-lg font-bold text-green-600 rounded border-gray-300 py-2 focus:ring-green-500 focus:border-green-500 transition-colors 
-                    @if ($metode_pembayaran === 'non_cash') bg-gray-100 cursor-not-allowed @endif">
-
-                @if ($metode_pembayaran === 'non_cash')
-                    <p class="text-xs text-indigo-500 mt-1 italic">Nominal otomatis disesuaikan untuk pembayaran
-                        Non-Cash.</p>
-                @endif
+                <div class="relative">
+                    <span class="absolute left-2 top-0.5 text-[8px] font-black text-slate-400 uppercase">UANG
+                        DITERIMA</span>
+                    <input type="text" :value="formattedUang" @input="updateUang"
+                        @if ($metode_pembayaran === 'non_cash') readonly @endif
+                        class="w-full text-base font-black text-slate-900 text-right rounded-none border-2 border-slate-800 pt-3 pb-1 px-2 focus:ring-0 focus:border-indigo-600 @if ($metode_pembayaran === 'non_cash') bg-slate-200 @else bg-white @endif">
+                </div>
             </div>
 
-            <div class="flex space-x-2 mt-4">
-
-                <button wire:click="clearCart" onclick="return confirm('Yakin ingin membatalkan semua pesanan ini?')"
-                    class="w-1/3 bg-red-50 text-red-600 border border-red-200 font-bold py-2 text-sm rounded-lg hover:bg-red-100 transition-all active:scale-95">
-                    BATAL
-                </button>
-
+            <div class="flex gap-1">
+                <button wire:click="clearCart" wire:confirm="BATALKAN SEMUA?"
+                    class="w-1/4 bg-slate-200 text-slate-800 font-black text-[9px] uppercase rounded-none py-2 border border-slate-400 hover:bg-rose-600 hover:text-white transition-all">BATAL</button>
                 <button wire:click="checkout" wire:loading.attr="disabled"
-                    wire:loading.class="opacity-75 cursor-wait"
-                    class="relative w-2/3 bg-indigo-600 text-white font-bold py-2 text-sm rounded-lg hover:bg-indigo-700 transition-all shadow-md active:scale-95 flex justify-center items-center">
-
+                    class="w-3/4 bg-indigo-600 text-white font-black text-xs uppercase rounded-none py-2 hover:bg-indigo-700 transition-none border border-indigo-900 shadow-[3px_3px_0px_rgba(0,0,0,0.2)]">
                     <span wire:loading.remove wire:target="checkout">PROSES BAYAR</span>
-
-                    <span wire:loading wire:target="checkout" class="flex items-center">
-                        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg"
-                            fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor"
-                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                            </path>
-                        </svg>
-                        Memproses...
-                    </span>
-
+                    <span wire:loading wire:target="checkout">WAIT...</span>
                 </button>
             </div>
         </div>

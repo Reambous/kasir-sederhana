@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('email')->unique(); // Dijadikan unique index
             $table->string('password');
             $table->text('gambar')->nullable();
-            $table->enum('role', ['gudang', 'kasir']);
+            $table->enum('role', ['admin', 'gudang', 'kasir'])->default('kasir');
             $table->rememberToken();
             $table->timestamps();
         });

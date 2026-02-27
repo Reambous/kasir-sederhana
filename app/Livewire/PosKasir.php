@@ -103,7 +103,7 @@ class PosKasir extends Component
         $this->uang_diterima = 0;
         $this->metode_pembayaran = 'cash';
 
-        session()->flash('success', 'Keranjang berhasil dibatalkan dan dikosongkan.');
+        session()->flash('error', 'Keranjang berhasil dibatalkan dan dikosongkan.');
     }
 
     public function getTotalProperty()
@@ -239,7 +239,7 @@ class PosKasir extends Component
             });
         }
 
-        $products = $query->paginate(12);
+        $products = $query->paginate(24);
 
         return view('livewire.pos-kasir', [
             'products' => $products,
