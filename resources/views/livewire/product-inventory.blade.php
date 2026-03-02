@@ -140,6 +140,29 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="mt-4 pt-4 border-t-2 border-slate-900">
+                            <label class="block text-[10px] font-black text-slate-900 uppercase tracking-widest mb-2">
+                                Kategori / Tags (Pilih minimal satu)
+                            </label>
+
+                            <div class="flex flex-wrap gap-2">
+                                @forelse($tags ?? [] as $tag)
+                                    <label
+                                        class="inline-flex items-center cursor-pointer bg-slate-50 border-2 border-slate-800 px-3 py-1.5 hover:bg-indigo-600 hover:text-white group transition-none">
+                                        <input type="checkbox" name="tags[]" value="{{ $tag->id }}"
+                                            x-model="form.tags"
+                                            class="rounded-none border-2 border-slate-800 text-indigo-600 focus:ring-0 w-4 h-4 mr-2 group-hover:border-white">
+                                        <span
+                                            class="text-[10px] font-black uppercase tracking-widest group-hover:text-white">{{ $tag->nama }}</span>
+                                    </label>
+                                @empty
+                                    <span
+                                        class="text-[10px] font-black text-rose-600 uppercase tracking-widest bg-rose-100 px-2 py-1 border border-rose-300">
+                                        BELUM ADA KATEGORI. BUAT DULU DI MENU KATEGORI.
+                                    </span>
+                                @endforelse
+                            </div>
+                        </div>
                     </div>
                     <div class="bg-slate-100 p-4 border-t-2 border-slate-900 flex justify-end gap-2">
                         <button type="button" @click="showAdd = false; showEdit = false"

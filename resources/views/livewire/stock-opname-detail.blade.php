@@ -13,12 +13,7 @@
                 Selesai
             </p>
         </div>
-        <div class="text-left md:text-right">
-            <button onclick="window.print()"
-                class="bg-white text-slate-900 font-black px-6 py-2 text-xs uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition-none border-2 border-slate-900 shadow-[4px_4px_0px_rgba(255,255,255,0.2)]">
-                🖨️ Cetak Laporan
-            </button>
-        </div>
+
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-1 bg-slate-300 border border-slate-300 shadow-md">

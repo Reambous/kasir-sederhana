@@ -15,7 +15,7 @@ use App\Models\Order;
 */
 
 // Halaman depan (Welcome)
-Route::view('/', 'welcome');
+Route::redirect('/', '/login');
 
 // Halaman Dashboard dengan Statistik (Bisa diakses semua role yang login)
 Route::get('/dashboard', function () {

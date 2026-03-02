@@ -55,7 +55,7 @@ new class extends Component {
 
                     @if (auth()->user()->role === 'admin' || auth()->user()->role === 'kasir')
                         <x-nav-link :href="route('pos')" :active="request()->routeIs('pos')"
-                            class="text-emerald-400 hover:text-emerald-300 focus:text-emerald-300 uppercase text-xs font-black tracking-wider px-3 border-transparent hover:bg-slate-800 transition-colors">
+                            class="text-slate-300 hover:text-emerald-300 focus:text-emerald-300 uppercase text-xs  tracking-wider px-3 border-transparent hover:bg-slate-800 transition-colors">
                             Mesin POS
                         </x-nav-link>
                         <x-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')"
@@ -67,7 +67,7 @@ new class extends Component {
                     @if (auth()->user()->role === 'admin')
                         <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')"
                             class="text-indigo-400 hover:text-indigo-300 focus:text-indigo-300 uppercase text-xs font-black tracking-wider px-3 border-transparent hover:bg-slate-800 transition-colors">
-                            Pengguna
+                            Kelola Akun
                         </x-nav-link>
                     @endif
                 </div>

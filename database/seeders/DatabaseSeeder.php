@@ -44,5 +44,11 @@ class DatabaseSeeder extends Seeder
             // UserSeeder::class, (Jika kamu memisahkan user seeder)
             ProductSeeder::class,
         ]);
+
+        $this->call([
+            // UserSeeder::class,
+            TagSeeder::class,      // <--- Pastikan Tag berjalan sebelum Product
+            // ProductSeeder::class,
+        ]);
     }
 }
