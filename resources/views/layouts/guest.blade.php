@@ -6,10 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'POS Login') }}</title>
+    <title>{{ config('app.name', 'POS SYSTEM') }}</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/logo-kasir.png') }}">
 
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -26,18 +27,17 @@
             </div>
         </div>
 
-        <div class="z-10 mb-8 text-center">
-            <a href="/" wire:navigate class="flex flex-col items-center gap-2">
-                <div class="w-16 h-16 bg-indigo-600 rounded-xl shadow-lg flex items-center justify-center">
-                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                    </svg>
-                </div>
-                <span class="text-3xl font-black tracking-wider text-white mt-2">NAMA_TOKO_KAMU</span>
-                <span class="text-sm tracking-widest text-slate-400 font-semibold uppercase">Enterprise POS
-                    System</span>
-            </a>
+
+
+        <div class="z-10 mb-8 text-center pt-10 sm:pt-16 no-print">
+
+            <div class=" ">
+                <x-application-logo class="w-48 h-48 object-contain" />
+            </div>
+            <span class="text-white font-black text-2xl tracking-[0.2em] uppercase hidden sm:block ">
+                POS<span class="text-indigo-500">SYS</span>
+            </span>
+
         </div>
 
         <div
@@ -46,7 +46,7 @@
         </div>
 
         <div class="z-10 mt-8 text-slate-500 text-xs text-center font-medium">
-            &copy; {{ date('Y') }} Nama Perusahaan. All rights reserved.<br>
+            &copy; {{ date('Y') }} POSSYS. All rights reserved.<br>
             Restricted System Access.
         </div>
     </div>

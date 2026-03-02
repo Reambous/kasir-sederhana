@@ -7,24 +7,24 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-
 class RoleMiddleware
 {
-    public function handle(Request $request, Closure $next, $role)
+    public function handle(Request $request, Closure $next, $role): Response
     {
-        // 1. Cek apakah user sudah login
+        // 1. Cek apakah user sudah login, jika belum lempar ke halaman login
         if (!Auth::check()) {
-            return redirect('/');
+            return redirect('/login');
         }
 
-        // 2. Jika dia adalah 'admin', langsung loloskan tanpa banyak tanya!
+        // 2. SUPER ADMIN: Jika dia adalah 'admin', langsung loloskan tanpa banyak tanya!
         if (Auth::user()->role === 'admin') {
             return $next($request);
         }
 
-        // 3. Jika bukan admin, cek apakah role-nya sesuai dengan rute yang diminta
+        // 3. TENDANGAN MAUT: Jika bukan admin, dan role tidak sesuai dengan rute
         if (Auth::user()->role !== $role) {
-            abort(403, 'Akses Ditolak. Halaman ini bukan untuk Role Anda.');
+            // Ini yang akan melempar mereka kembali ke dashboard beserta pesan error kaku
+            return redirect()->route('dashboard')->with('error', 'AKSES DITOLAK! OTORITAS ANDA TIDAK MENCUKUPI UNTUK MEMBUKA HALAMAN INI.');
         }
 
         return $next($request);

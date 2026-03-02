@@ -21,11 +21,8 @@ new class extends Component {
             <div class="flex items-center">
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}" wire:navigate class="flex items-center gap-2">
-                        <div class="w-8 h-8 bg-indigo-600 flex items-center justify-center">
-                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                            </svg>
+                        <div class="">
+                            <x-application-logo class="w-10 h-10" />
                         </div>
                         <span class="text-white font-black text-xl tracking-wider uppercase hidden sm:block">POS<span
                                 class="text-indigo-500">SYS</span></span>
@@ -55,7 +52,7 @@ new class extends Component {
 
                     @if (auth()->user()->role === 'admin' || auth()->user()->role === 'kasir')
                         <x-nav-link :href="route('pos')" :active="request()->routeIs('pos')"
-                            class="text-slate-300 hover:text-emerald-300 focus:text-emerald-300 uppercase text-xs  tracking-wider px-3 border-transparent hover:bg-slate-800 transition-colors">
+                            class="text-slate-300 hover:text-white focus:text-white uppercase text-xs  tracking-wider px-3 border-transparent hover:bg-slate-800 transition-colors">
                             Mesin POS
                         </x-nav-link>
                         <x-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')"
