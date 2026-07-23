@@ -1,8 +1,3 @@
-<p align="center">
-  <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="200" alt="POS Inventory Logo">
-</p>
-
-<h1 align="center">POS Inventory System (POSSYS Enterprise)</h1>
 
 <p align="center">
   Aplikasi Point of Sale (POS) dan Manajemen Inventaris berbasis web dengan Laravel, Livewire, dan Tailwind CSS.
