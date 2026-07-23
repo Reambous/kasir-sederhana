@@ -1,59 +1,184 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
-
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="200" alt="POS Inventory Logo">
 </p>
 
-## About Laravel
+<h1 align="center">POS Inventory System (POSSYS Enterprise)</h1>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+<p align="center">
+  Aplikasi Point of Sale (POS) dan Manajemen Inventaris berbasis web dengan Laravel, Livewire, dan Tailwind CSS.
+</p>
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Deskripsi Proyek
 
-## Learning Laravel
+**POS Inventory System (POSSYS Enterprise)** adalah aplikasi web untuk mengelola penjualan (POS) dan inventaris barang. Aplikasi ini mendukung tiga peran pengguna — **Admin**, **Gudang** (Warehouse), dan **Kasir** (Cashier) — masing-masing dengan hak akses yang sesuai.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+Fitur utama meliputi terminal POS dengan keranjang belanja real-time, manajemen produk dan kategori, stock opname (audit stok fisik), riwayat transaksi, cetak struk thermal, serta manajemen pengguna.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## Tech Stack & Tools
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+| Komponen | Teknologi |
+|---|---|
+| **Backend Framework** | Laravel 12 |
+| **PHP** | PHP ^8.2 |
+| **Database** | MySQL (default), juga support PostgreSQL, SQLite, SQL Server |
+| **Reactive Components** | Livewire 3 + Volt |
+| **Frontend UI** | Tailwind CSS 3 |
+| **JavaScript** | Alpine.js, Axios |
+| **Build Tool** | Vite |
+| **Auth Scaffolding** | Laravel Breeze |
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## Fitur Utama
 
-## Contributing
+### 1. POS Kasir
+- Katalog produk dengan pencarian (nama/barcode) dan filter kategori (tag)
+- Grid produk dengan gambar, harga, dan indikator stok
+- Keranjang belanja interaktif (tambah/kurang qty, input manual)
+- Validasi stok — mencegah checkout jika stok tidak mencukupi
+- Checkout dengan nama pembeli, metode bayar (Cash/Transfer), potongan harga, nominal diterima, dan hitung kembalian otomatis
+- Cetak struk (format thermal printer 80mm) dengan `window.print()`
+- Menggunakan **row locking** (`lockForUpdate`) untuk mencegah race condition
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 2. Manajemen Produk
+- CRUD produk (nama, barcode, stok, harga beli, harga jual, gambar, kategori)
+- Upload gambar produk
+- Indikator stok color-coded (hijau >= 10, merah < 10)
+- Pencarian produk (nama/barcode)
+- Urut berdasarkan stok (stok terendah paling atas)
 
-## Code of Conduct
+### 3. Kategori / Tag
+- CRUD kategori produk
+- Pencarian dan pagination
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 4. Stock Opname (Audit Stok Fisik)
+- Buat session opname baru — otomatis snapshot stok semua produk
+- Input jumlah fisik per produk dengan **auto-save** real-time
+- Tambah kolom keterangan/catatan per produk
+- Sinkronisasi produk baru ke session yang sedang berjalan
+- Selesaikan session — stok aktual produk langsung terupdate
+- Batalkan session (hapus session dan data)
+- Arsip history opname dengan detail selisih stok
 
-## Security Vulnerabilities
+### 5. Riwayat Transaksi
+- Tabel semua transaksi dengan pencarian
+- Lihat detail invoice dan cetak ulang struk
+- Hapus pesanan (stok otomatis dikembalikan)
+- Hapus massal pesanan minggu ini
+- Total pendapatan berjalan berdasarkan filter pencarian
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 6. Manajemen Pengguna (Admin Only)
+- CRUD pengguna dengan role (Admin, Gudang, Kasir)
+- Pencarian pengguna
+- Tidak bisa menghapus akun sendiri
+
+### 7. Dashboard
+- Kartu statistik: total transaksi hari ini, total produk, produk stok menipis (< 10)
+- Navigasi cepat berdasarkan role
+- Log transaksi terbaru
+
+---
+
+## Role Pengguna & Akun Default
+
+| Role | Nama | Email | Password |
+|---|---|---|---|
+| **Admin** | admin | admin@gmail.com | admin123 |
+| **Gudang** (Warehouse) | haidar | haidar@gmail.com | haidar123 |
+| **Kasir** (Cashier) | anas | anas@gmail.com | anas12345 |
+
+---
+
+## Screenshot
+
+> _Screenshot akan ditambahkan. Upload screenshot ke folder `public/images/screenshots/` dan ganti `URL_SCREENSHOT` dengan URL gambar._
+
+### Dashboard
+![Dashboard](URL_SCREENSHOT_DASHBOARD)
+
+Tampilan dashboard dengan statistik transaksi, total produk, dan stok menipis.
+
+### POS Kasir
+![POS Kasir](URL_SCREENSHOT_POS)
+
+Terminal POS dengan katalog produk, keranjang belanja, dan form checkout.
+
+### Manajemen Produk
+![Manajemen Produk](URL_SCREENSHOT_PRODUK)
+
+Daftar produk dengan indikator stok, pencarian, dan form tambah/edit produk.
+
+### Stock Opname
+![Stock Opname](URL_SCREENSHOT_OPNAME)
+
+Session stock opname dengan input jumlah fisik dan auto-save.
+
+### Riwayat Transaksi
+![Riwayat Transaksi](URL_SCREENSHOT_ORDER)
+
+Daftar transaksi dengan pencarian, cetak ulang struk, dan total pendapatan.
+
+### Manajemen Pengguna
+![Manajemen Pengguna](URL_SCREENSHOT_USER)
+
+Manajemen user dengan role badge dan form CRUD.
+
+---
+
+## Cara Install
+
+### Prerequisites
+- PHP ^8.2
+- Composer
+- Node.js & npm
+- MySQL / PostgreSQL / SQLite
+
+### Langkah Instalasi
+
+```bash
+# 1. Clone repositori
+git clone https://github.com/username/pos-inventory.git
+cd pos-inventory
+
+# 2. Install dependencies PHP
+composer install
+
+# 3. Copy environment file
+cp .env.example .env
+
+# 4. Generate application key
+php artisan key:generate
+
+# 5. Buat database (misal: pos_inventory) dan atur koneksi di .env
+#    DB_CONNECTION=mysql
+#    DB_DATABASE=pos_inventory
+#    DB_USERNAME=root
+#    DB_PASSWORD=
+
+# 6. Jalankan migrasi dan seeder
+php artisan migrate --seed
+
+# 7. Install dependencies frontend
+npm install
+
+# 8. Build assets
+npm run build
+
+# 9. Buat storage link
+php artisan storage:link
+
+# 10. Jalankan development server
+php artisan serve
+```
+
+Akses aplikasi di `http://localhost:8000`.
+
+---
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Proyek ini menggunakan lisensi **MIT**.
