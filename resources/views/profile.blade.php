@@ -15,7 +15,7 @@
             <div
                 class="w-32 h-32 bg-slate-800 border-4 border-white shadow-[8px_8px_0px_rgba(0,0,0,1)] flex items-center justify-center relative z-10">
                 @if (auth()->user()->gambar)
-                    <img src="{{ asset('storage/' . auth()->user()->gambar) }}" class="w-full h-full object-cover">
+                    <img src="{{ auth()->user()->gambar->url }}" class="w-full h-full object-cover">
                 @else
                     <span
                         class="text-5xl font-black text-indigo-500 uppercase">{{ substr(auth()->user()->nama, 0, 1) }}</span>

@@ -1,9 +1,18 @@
-<div x-data="{ showAdd: false, showEdit: false, editUrl: '', form: { nama: '', barcode: '', harga_beli: '', harga_jual: '', jumlah: '', tags: [] } }" class="w-full">
+<div x-data="{ showAdd: false, showEdit: false, editUrl: '', previewUrl: '', form: { nama: '', barcode: '', harga_beli: '', harga_jual: '', jumlah: '', tags: [], existingGambar: '' } }" class="w-full">
 
     @if (session('success'))
         <div
             class="mb-4 bg-emerald-600 text-white px-4 py-3 border-l-8 border-emerald-900 shadow-md uppercase font-black text-xs tracking-widest">
             {{ session('success') }}
+        </div>
+    @endif
+
+    @if ($errors->any())
+        <div
+            class="mb-4 bg-rose-600 text-white px-4 py-3 border-l-8 border-rose-900 shadow-md uppercase font-black text-xs tracking-widest space-y-1">
+            @foreach ($errors->all() as $error)
+                <div>{{ $error }}</div>
+            @endforeach
         </div>
     @endif
 
@@ -23,7 +32,8 @@
                         </svg>
                     </div>
                 </div>
-                <button @click="showAdd = true"
+                <button
+                    @click="form = { nama: '', barcode: '', harga_beli: '', harga_jual: '', jumlah: '', tags: [], existingGambar: '' }; previewUrl = ''; showAdd = true"
                     class="bg-indigo-600 hover:bg-indigo-700 text-white font-black py-2 px-4 text-xs uppercase tracking-widest border border-indigo-800 transition-none rounded-none shadow-md">
                     + TAMBAH BARANG
                 </button>
@@ -65,6 +75,8 @@
                                     form.harga_jual = '{{ $product->harga_jual }}';
                                     form.jumlah = '{{ $product->jumlah }}';
                                     form.tags = {{ $product->tags->pluck('id')->toJson() }};
+                                    form.existingGambar = '{{ $product->gambar?->url ?? '' }}';
+                                    previewUrl = '';
                                     editUrl = '{{ route('products.update', $product->id) }}';
                                     showEdit = true;
                                 "
@@ -93,17 +105,17 @@
     </div>
 
     <template x-if="showAdd || showEdit">
-        <div class="fixed inset-0 z-[60] flex items-center justify-center p-4">
+        <div class="fixed inset-0 z-[60] flex items-center justify-center p-2 sm:p-4">
             <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm" @click="showAdd = false; showEdit = false">
             </div>
             <div
                 class="relative bg-white border-2 border-slate-900 shadow-[10px_10px_0px_rgba(0,0,0,1)] w-full max-w-lg rounded-none overflow-hidden">
                 <form :action="showAdd ? '{{ route('products.store') }}' : editUrl" method="POST"
-                    enctype="multipart/form-data">
+                    enctype="multipart/form-data" class="flex flex-col max-h-[85vh] sm:max-h-[90vh]">
                     @csrf
                     <template x-if="showEdit">@method('PUT')</template>
 
-                    <div class="p-5">
+                    <div class="p-5 overflow-y-auto flex-1 min-h-0">
                         <h3 class="text-sm font-black uppercase tracking-widest border-b-2 border-slate-900 pb-2 mb-4"
                             x-text="showAdd ? 'INPUT BARANG BARU' : 'EDIT DATA BARANG'"></h3>
                         <div class="grid grid-cols-1 gap-4">
@@ -137,6 +149,36 @@
                                         Jual</label>
                                     <input type="number" name="harga_jual" x-model="form.harga_jual" required
                                         class="w-full border-2 border-slate-800 rounded-none text-sm font-bold uppercase focus:ring-0">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-4 border-t-2 border-slate-900">
+                            <label class="block text-[10px] font-black text-slate-900 uppercase tracking-widest mb-2">
+                                Gambar Produk (Opsional)
+                            </label>
+                            <div class="flex items-start gap-4">
+                                <div
+                                    class="w-24 h-24 shrink-0 border-2 border-slate-800 bg-slate-100 flex items-center justify-center overflow-hidden">
+                                    <template x-if="previewUrl || form.existingGambar">
+                                        <img :src="previewUrl || form.existingGambar" alt="Preview gambar"
+                                            class="w-full h-full object-cover">
+                                    </template>
+                                    <template x-if="!previewUrl && !form.existingGambar">
+                                        <span
+                                            class="text-[9px] font-black text-slate-400 uppercase text-center px-1">TANPA
+                                            GAMBAR</span>
+                                    </template>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <input type="file" name="gambar" accept="image/jpeg,image/png,image/jpg"
+                                        x-on:change="
+                                            if (previewUrl) URL.revokeObjectURL(previewUrl);
+                                            previewUrl = $event.target.files[0] ? URL.createObjectURL($event.target.files[0]) : '';
+                                        "
+                                        class="block w-full text-xs font-bold text-slate-600 file:mr-3 file:py-2 file:px-3 file:border-2 file:border-slate-900 file:bg-white file:text-[10px] file:font-black file:uppercase file:tracking-widest hover:file:bg-slate-100 file:rounded-none">
+                                    <p class="mt-2 text-[10px] font-bold text-slate-500 uppercase">
+                                        JPEG / PNG &middot; Maks 2MB &middot; Biarkan kosong untuk mempertahankan gambar
+                                    </p>
                                 </div>
                             </div>
                         </div>

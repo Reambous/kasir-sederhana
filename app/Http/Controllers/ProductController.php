@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Http\Requests\StoreProductRequest;
+use App\Services\ObjectStorage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\UpdateProductRequest;
-use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -16,22 +16,28 @@ class ProductController extends Controller
         return view('products.index');
     }
 
-    public function store(StoreProductRequest $request)
+    public function store(StoreProductRequest $request, ObjectStorage $storage)
     {
         $data = $request->validated();
+        unset($data['gambar']);
 
-        // JIKA ADA FILE GAMBAR YANG DIUPLOAD
+        $object = null;
+
         if ($request->hasFile('gambar')) {
-            $data['gambar'] = $request->file('gambar')->store('products', 'public');
+            $object = $storage->put($request->file('gambar'), 'products', Auth::user());
+            $data['gambar_object_id'] = $object->getKey();
         }
 
-        // ==========================================
-        // DUA BARIS PENYELAMAT DATABASE
-        // ==========================================
         $data['tanggal_masuk'] = now();
-        $data['user_id'] = Auth::id(); // Mengambil ID dari akun yang sedang login saat ini
+        $data['user_id'] = Auth::id();
 
-        $product = Product::create($data);
+        try {
+            $product = Product::create($data);
+        } catch (\Throwable $e) {
+            $storage->delete($object);
+
+            throw $e;
+        }
 
         if ($request->has('tags')) {
             $product->tags()->sync($request->tags);
@@ -40,43 +46,48 @@ class ProductController extends Controller
         return back()->with('success', 'Barang berhasil ditambahkan!');
     }
 
-    // ... fungsi store yang sebelumnya sudah ada ...
-
-    // Fungsi untuk memproses Update Data
-    public function update(UpdateProductRequest $request, Product $product)
+    public function update(UpdateProductRequest $request, Product $product, ObjectStorage $storage)
     {
         $data = $request->validated();
+        unset($data['gambar']);
 
-        // JIKA KITA MENGGANTI GAMBAR SAAT EDIT
+        $oldObject = $product->gambar;
+        $newObject = null;
+
         if ($request->hasFile('gambar')) {
-            // Hapus gambar lama dari server (agar hardisk tidak penuh)
-            if ($product->gambar) {
-                Storage::disk('public')->delete($product->gambar);
-            }
-            // Simpan gambar baru
-            $data['gambar'] = $request->file('gambar')->store('products', 'public');
+            $newObject = $storage->put($request->file('gambar'), 'products', Auth::user());
+            $data['gambar_object_id'] = $newObject->getKey();
         }
 
-        $product->update($data);
+        try {
+            DB::transaction(function () use ($product, $data, $request) {
+                $product->update($data);
 
-        if ($request->has('tags')) {
-            $product->tags()->sync($request->tags);
-        } else {
-            $product->tags()->detach();
+                if ($request->has('tags')) {
+                    $product->tags()->sync($request->tags);
+                } else {
+                    $product->tags()->detach();
+                }
+            });
+        } catch (\Throwable $e) {
+            $storage->delete($newObject);
+
+            throw $e;
+        }
+
+        $product->unsetRelation('gambar');
+
+        if ($oldObject && $newObject) {
+            $storage->delete($oldObject);
         }
 
         return back()->with('success', 'Data barang berhasil diupdate!');
     }
 
-    // Fungsi untuk memproses Hapus Data
     public function destroy(Product $product)
     {
-        // Hapus juga gambar fisiknya saat barang dihapus
-        if ($product->gambar) {
-            Storage::disk('public')->delete($product->gambar);
-        }
-
         $product->delete();
+
         return back()->with('success', 'Barang berhasil dihapus!');
     }
 }

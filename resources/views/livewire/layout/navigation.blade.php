@@ -78,7 +78,7 @@ new class extends Component {
 
                             <div class="mr-3">
                                 @if (Auth::user()->gambar)
-                                    <img src="{{ asset('storage/' . Auth::user()->gambar) }}"
+                                    <img src="{{ Auth::user()->gambar->url }}"
                                         class="w-8 h-8 rounded-none border-2 border-indigo-500 object-cover shadow-[2px_2px_0px_rgba(0,0,0,1)]">
                                 @else
                                     <div
@@ -140,6 +140,40 @@ new class extends Component {
                 class="text-white font-bold uppercase tracking-wider text-sm">
                 Dashboard
             </x-responsive-nav-link>
+
+            @if (auth()->user()->role === 'admin' || auth()->user()->role === 'gudang')
+                <x-responsive-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')"
+                    class="text-white font-bold uppercase tracking-wider text-sm">
+                    Inventaris
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('tags.index')" :active="request()->routeIs('tags.*')"
+                    class="text-white font-bold uppercase tracking-wider text-sm">
+                    Kategori
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('stock-opnames.index')"
+                    :active="request()->routeIs('stock-opnames.*')"
+                    class="text-white font-bold uppercase tracking-wider text-sm">
+                    Opname
+                </x-responsive-nav-link>
+            @endif
+
+            @if (auth()->user()->role === 'admin' || auth()->user()->role === 'kasir')
+                <x-responsive-nav-link :href="route('pos')" :active="request()->routeIs('pos')"
+                    class="text-white font-bold uppercase tracking-wider text-sm">
+                    Mesin POS
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')"
+                    class="text-white font-bold uppercase tracking-wider text-sm">
+                    Transaksi
+                </x-responsive-nav-link>
+            @endif
+
+            @if (auth()->user()->role === 'admin')
+                <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')"
+                    class="text-white font-bold uppercase tracking-wider text-sm">
+                    Kelola Akun
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <div class="pt-4 pb-1 border-t border-slate-700">

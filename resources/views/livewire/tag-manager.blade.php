@@ -63,9 +63,9 @@
     </div>
 
     <template x-if="showEdit">
-        <div class="fixed inset-0 z-[60] flex items-center justify-center p-4">
+        <div class="fixed inset-0 z-[60] flex items-center justify-center p-2 sm:p-4">
             <div class="fixed inset-0 bg-slate-900/90" @click="showEdit = false"></div>
-            <div class="relative bg-white border-4 border-slate-900 w-full max-w-sm rounded-none">
+            <div class="relative bg-white border-4 border-slate-900 w-full max-w-sm rounded-none max-h-[85vh] overflow-y-auto">
                 <form :action="editUrl" method="POST" class="p-6">
                     @csrf @method('PUT')
                     <h3

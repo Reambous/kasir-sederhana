@@ -41,7 +41,7 @@ Fitur utama meliputi terminal POS dengan keranjang belanja real-time, manajemen 
 
 ### 2. Manajemen Produk
 - CRUD produk (nama, barcode, stok, harga beli, harga jual, gambar, kategori)
-- Upload gambar produk
+- Upload gambar produk dengan **preview real-time** di form tambah/edit
 - Indikator stok color-coded (hijau >= 10, merah < 10)
 - Pencarian produk (nama/barcode)
 - Urut berdasarkan stok (stok terendah paling atas)
@@ -76,6 +76,16 @@ Fitur utama meliputi terminal POS dengan keranjang belanja real-time, manajemen 
 - Navigasi cepat berdasarkan role
 - Log transaksi terbaru
 
+### 8. Object Storage & Metadata Gambar
+- File gambar (produk & avatar profil) disimpan di disk `public` dengan nama acak, bukan nama asli
+- Setiap file tercatat di tabel **`objects`**: `key`, `original_name`, `mime_type`, `size`, `uploader_id`
+- FK `gambar_object_id` di tabel `products` & `users` menggantikan path tekstual lama
+- Service `App\Services\ObjectStorage` menangani upload dengan **kompensasi otomatis** (gagal simpan metadata = file ikut dibuang)
+- **Lifecycle anti-orphan** berbasis event Eloquent:
+  - hapus produk → gambar & metadata ikut terhapus
+  - hapus user → avatar + semua gambar produk miliknya ikut terhapus
+  - ganti gambar → objek lama dihapus setelah transaksi berhasil
+
 ---
 
 ## Role Pengguna & Akun Default
@@ -92,3 +102,68 @@ Fitur utama meliputi terminal POS dengan keranjang belanja real-time, manajemen 
 
 <img width="1888" height="1043" alt="image" src="https://github.com/user-attachments/assets/ec91ae08-57ed-43b1-81dc-0bf6a31f446b" />
 
+---
+
+## Cara Install
+
+### Prerequisites
+- PHP ^8.2
+- Composer
+- Node.js & npm
+- MySQL / PostgreSQL / SQLite
+
+### Langkah Instalasi
+
+```bash
+# 1. Clone repositori
+git clone https://github.com/username/pos-inventory.git
+cd pos-inventory
+
+# 2. Install dependencies PHP
+composer install
+
+# 3. Copy environment file
+cp .env.example .env
+
+# 4. Generate application key
+php artisan key:generate
+
+# 5. Buat database (misal: pos_inventory) dan atur koneksi di .env
+#    DB_CONNECTION=mysql
+#    DB_DATABASE=pos_inventory
+#    DB_USERNAME=root
+#    DB_PASSWORD=
+
+# 6. Jalankan migrasi dan seeder
+php artisan migrate --seed
+
+# 7. Install dependencies frontend
+npm install
+
+# 8. Build assets
+npm run build
+
+# 9. Buat storage link
+php artisan storage:link
+
+# 10. Jalankan development server
+php artisan serve
+```
+
+Akses aplikasi di `http://localhost:8000`.
+
+---
+
+## Testing
+
+```bash
+php artisan test
+```
+
+Menjalankan seluruh suite test (auth, profil, dsb.) — pastikan database testing sudah dikonfigurasi di `.env.testing`.
+
+---
+
+## License
+
+Proyek ini menggunakan lisensi **MIT**.

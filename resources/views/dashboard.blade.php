@@ -7,13 +7,14 @@
 
     <div class="w-full">
         <div
-            class="bg-slate-900 text-white p-8 border-b-4 border-indigo-600 mb-8 flex flex-col md:flex-row justify-between items-center shadow-lg relative overflow-hidden">
+            class="bg-slate-900 text-white p-5 sm:p-8 border-b-4 border-indigo-600 mb-8 flex flex-col md:flex-row justify-between items-center shadow-lg relative overflow-hidden">
             <div
                 class="absolute top-0 right-0 w-64 h-64 bg-indigo-600 rounded-full mix-blend-multiply filter blur-3xl opacity-30 translate-x-1/2 -translate-y-1/2">
             </div>
 
             <div class="relative z-10 text-center md:text-left">
-                <h3 class="text-3xl font-black tracking-tight mb-1 uppercase">SELAMAT DATANG, {{ auth()->user()->nama }}
+                <h3 class="text-2xl sm:text-3xl font-black tracking-tight mb-1 uppercase break-words">SELAMAT DATANG,
+                    {{ auth()->user()->nama }}
                 </h3>
                 <p class="text-slate-400 font-medium tracking-wide text-sm mt-2">
                     STATUS OTORITAS:
@@ -26,8 +27,8 @@
             <div
                 class="relative z-10 mt-6 md:mt-0 text-center md:text-right border-t md:border-t-0 border-slate-700 pt-4 md:pt-0">
                 <div class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Waktu Sistem Server</div>
-                <div class="text-2xl font-black text-slate-100 tracking-wider">{{ now()->format('d M Y') }} <span
-                        class="text-indigo-400">•</span> {{ now()->format('H:i') }} WIB</div>
+                <div class="text-lg sm:text-2xl font-black text-slate-100 tracking-wider">{{ now()->format('d M Y') }}
+                    <span class="text-indigo-400">•</span> {{ now()->format('H:i') }} WIB</div>
             </div>
         </div>
 
@@ -35,7 +36,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 
                 <div
-                    class="bg-white border-2 border-slate-200 p-6 shadow-sm hover:border-emerald-500 transition-colors group relative overflow-hidden">
+                    class="bg-white border-2 border-slate-200 p-4 sm:p-6 shadow-sm hover:border-emerald-500 transition-colors group relative overflow-hidden">
                     <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 transition-transform">
                         <svg class="w-32 h-32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -48,7 +49,7 @@
                             <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Transaksi Hari
                                 Ini</p>
                             <h4
-                                class="text-5xl font-black text-slate-900 group-hover:text-emerald-600 transition-colors">
+                                class="text-4xl sm:text-5xl font-black text-slate-900 group-hover:text-emerald-600 transition-colors">
                                 {{ $totalOrders }}</h4>
                         </div>
                         <div class="p-3 bg-emerald-50 text-emerald-600 border border-emerald-100">
@@ -61,7 +62,7 @@
                 </div>
 
                 <div
-                    class="bg-white border-2 border-slate-200 p-6 shadow-sm hover:border-blue-500 transition-colors group relative overflow-hidden">
+                    class="bg-white border-2 border-slate-200 p-4 sm:p-6 shadow-sm hover:border-blue-500 transition-colors group relative overflow-hidden">
                     <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 transition-transform">
                         <svg class="w-32 h-32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -72,7 +73,7 @@
                         <div>
                             <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Total Item Gudang
                             </p>
-                            <h4 class="text-5xl font-black text-slate-900 group-hover:text-blue-600 transition-colors">
+                            <h4 class="text-4xl sm:text-5xl font-black text-slate-900 group-hover:text-blue-600 transition-colors">
                                 {{ $totalProducts }}</h4>
                         </div>
                         <div class="p-3 bg-blue-50 text-blue-600 border border-blue-100">
@@ -86,7 +87,7 @@
                 </div>
 
                 <div
-                    class="bg-white border-2 {{ $lowStock > 0 ? 'border-rose-400 bg-rose-50' : 'border-slate-200' }} p-6 shadow-sm hover:border-rose-600 transition-colors group relative overflow-hidden">
+                    class="bg-white border-2 {{ $lowStock > 0 ? 'border-rose-400 bg-rose-50' : 'border-slate-200' }} p-4 sm:p-6 shadow-sm hover:border-rose-600 transition-colors group relative overflow-hidden">
                     <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 transition-transform">
                         <svg class="w-32 h-32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -100,7 +101,7 @@
                                 class="text-xs font-bold {{ $lowStock > 0 ? 'text-rose-600' : 'text-slate-500' }} uppercase tracking-widest mb-1">
                                 Peringatan Stok < 10</p>
                                     <h4
-                                        class="text-5xl font-black {{ $lowStock > 0 ? 'text-rose-700' : 'text-slate-900' }} group-hover:text-rose-600 transition-colors">
+                                        class="text-4xl sm:text-5xl font-black {{ $lowStock > 0 ? 'text-rose-700' : 'text-slate-900' }} group-hover:text-rose-600 transition-colors">
                                         {{ $lowStock }}</h4>
                         </div>
                         <div
@@ -178,21 +179,21 @@
         </div>
         <div class="w-full space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-0 bg-slate-300 border-2 border-slate-900">
-                <div class="bg-white p-6 border-r-2 border-slate-900 md:border-b-0 border-b-2">
+                <div class="bg-white p-4 sm:p-6 border-b-2 border-slate-900 md:border-b-0 md:border-r-2">
                     <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Total Transaksi</p>
-                    <h4 class="text-4xl font-black text-slate-900 leading-none">
+                    <h4 class="text-3xl sm:text-4xl font-black text-slate-900 leading-none">
                         {{ \App\Models\Order::count() }}
                     </h4>
                 </div>
-                <div class="bg-white p-6 border-r-2 border-slate-900 md:border-b-0 border-b-2">
+                <div class="bg-white p-4 sm:p-6 border-b-2 border-slate-900 md:border-b-0 md:border-r-2">
                     <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Total Produk</p>
-                    <h4 class="text-4xl font-black text-slate-900 leading-none">
+                    <h4 class="text-3xl sm:text-4xl font-black text-slate-900 leading-none">
                         {{ \App\Models\Product::count() }}
                     </h4>
                 </div>
-                <div class="bg-white p-6">
+                <div class="bg-white p-4 sm:p-6">
                     <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Sesi Opname</p>
-                    <h4 class="text-4xl font-black text-slate-900 leading-none">
+                    <h4 class="text-3xl sm:text-4xl font-black text-slate-900 leading-none">
                         {{ \App\Models\StockOpname::where('status', 'done')->count() }}
                     </h4>
                 </div>

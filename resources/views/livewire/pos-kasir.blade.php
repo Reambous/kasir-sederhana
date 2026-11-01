@@ -51,7 +51,7 @@
                         <div
                             class="w-full h-20 bg-slate-100 flex items-center justify-center overflow-hidden border-b border-slate-200">
                             @if ($product->gambar)
-                                <img src="{{ asset('storage/' . $product->gambar) }}" alt="{{ $product->nama }}"
+                                <img src="{{ $product->gambar->url }}" alt="{{ $product->nama }}"
                                     class="w-full h-full object-cover">
                             @else
                                 <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor"

@@ -40,19 +40,27 @@ new class extends Component {
             'email' => $validated['email'],
         ]);
 
-        if ($user->isDirty('email')) {
-            $user->email_verified_at = null;
-        }
+        $oldObject = $user->gambar;
+        $newObject = null;
 
         if ($this->gambar) {
-            // Hapus foto lama jika ada
-            if ($user->gambar) {
-                Storage::disk('public')->delete($user->gambar);
-            }
-            // Simpan foto baru ke folder 'users'
-            $user->gambar = $this->gambar->store('users', 'public');
+            $newObject = app(\App\Services\ObjectStorage::class)->put($this->gambar, 'users', $user);
+            $user->gambar_object_id = $newObject->getKey();
         }
-        $user->save();
+
+        try {
+            $user->save();
+        } catch (\Throwable $e) {
+            app(\App\Services\ObjectStorage::class)->delete($newObject);
+
+            throw $e;
+        }
+
+        if ($oldObject && $newObject) {
+            app(\App\Services\ObjectStorage::class)->delete($oldObject);
+        }
+
+        $user->unsetRelation('gambar');
 
         $this->dispatch('profile-updated', name: $user->nama);
     }
@@ -92,11 +100,11 @@ new class extends Component {
             <div class="shrink-0">
                 @if (auth()->user()->gambar)
                     <img class="h-16 w-16 object-cover rounded-full shadow"
-                        src="{{ asset('storage/' . auth()->user()->gambar) }}" alt="Foto Profil">
+                        src="{{ auth()->user()->gambar->url }}" alt="Foto Profil">
                 @else
                     <div
                         class="h-16 w-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center font-bold text-xl shadow">
-                        {{ substr(auth()->user()->gambar, 0, 1) }}
+                        {{ strtoupper(substr(auth()->user()->nama, 0, 1)) }}
                     </div>
                 @endif
             </div>

@@ -15,7 +15,7 @@ class User extends Authenticatable
         'nama',
         'email',
         'password',
-        'gambar',
+        'gambar_object_id',
         'role'
     ];
 
@@ -40,5 +40,28 @@ class User extends Authenticatable
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function gambar(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(StoredObject::class, 'gambar_object_id');
+    }
+
+    private array $doomedObjectIds = [];
+
+    protected static function booted(): void
+    {
+        static::deleting(function (User $user) {
+            $user->doomedObjectIds = collect([$user->gambar_object_id])
+                ->merge($user->products()->pluck('gambar_object_id'))
+                ->filter()
+                ->unique()
+                ->values()
+                ->all();
+        });
+
+        static::deleted(function (User $user) {
+            app(\App\Services\ObjectStorage::class)->deleteKeys($user->doomedObjectIds);
+        });
     }
 }
